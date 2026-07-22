@@ -65,3 +65,8 @@ Do not commit the Jiangsu `.osm.pbf`, generated ORS graphs, secrets, virtual env
 ## Important
 
 This is a demonstrator. Simulated data and model outputs are not real emergency orders. Human confirmation remains mandatory.
+
+
+## Brand assets
+
+The vector SkyRoute 天途 logo is stored in `assets/skyroute_tiantu_vector.svg` and embedded in `app.py` for reliable local and cloud rendering.
