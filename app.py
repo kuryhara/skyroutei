@@ -110,9 +110,9 @@ st.markdown(
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 [data-testid="stSidebar"],
 [data-testid="collapsedControl"],
-[data-testid="stSidebarCollapsedControl"] {display:none!important;}
-.sr-top-controls{border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:10px 12px;background:rgba(5,15,12,.86);margin:4px 0 12px;box-shadow:0 0 22px rgba(0,229,255,.035);}
-.sr-control-note{font:9px 'JetBrains Mono';color:#91A87A;margin:-3px 0 8px;}
+[data-testid="stSidebarCollapsedControl"] {{display:none!important;}}
+.sr-top-controls{{border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:10px 12px;background:rgba(5,15,12,.86);margin:4px 0 12px;box-shadow:0 0 22px rgba(0,229,255,.035);}}
+.sr-control-note{{font:9px 'JetBrains Mono';color:#91A87A;margin:-3px 0 8px;}}
 
 html, body, [class*="css"] {{font-family:'Poppins',sans-serif;}}
 .stApp {{background:radial-gradient(circle at 80% -10%,#18271D 0%,{INK} 34%,#030806 100%);color:{TEXT};}}
