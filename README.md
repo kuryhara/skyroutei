@@ -70,3 +70,11 @@ This is a demonstrator. Simulated data and model outputs are not real emergency 
 ## Brand assets
 
 The vector SkyRoute 天途 logo is stored in `assets/skyroute_tiantu_vector.svg` and embedded in `app.py` for reliable local and cloud rendering.
+
+## Interface update · v13
+
+- The permanent Streamlit sidebar was removed.
+- Workspace navigation and incident selection now sit at the top of the app.
+- Data, map-layer and scenario controls are grouped in a collapsible Operational controls panel.
+- Operational line colours now prioritise contrast and semantic distinction on dark maps:
+  police cyan, fire orange, HazMat magenta, EMS blue, evacuation violet, environment green, closure white, and traffic green/yellow/red.
