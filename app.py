@@ -154,6 +154,11 @@ button[kind="primary"] {{background:linear-gradient(135deg,{CYAN},{TEAL})!import
 .sr-weather-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px;}}
 .sr-weather-cell{{border:1px solid #405334;border-radius:9px;padding:8px;background:rgba(3,12,23,.55);font:9px 'JetBrains Mono';color:#B7C99D;}}
 .sr-weather-cell b{{display:block;color:#F2F6E8;font-size:12px;margin-top:4px;}}
+.sr-forecast-head{{margin:12px 0 0;padding:12px 14px 8px;border:1px solid rgba(213,242,109,.62);border-bottom:none;border-radius:14px 14px 0 0;background:linear-gradient(110deg,rgba(213,242,109,.11),rgba(6,17,14,.97));box-shadow:0 0 24px rgba(213,242,109,.14),inset 0 0 18px rgba(213,242,109,.035);}}
+.sr-forecast-head .title{{font-family:'Poppins';font-size:15px;font-weight:700;color:#D5F26D;letter-spacing:.035em;text-shadow:0 0 7px rgba(213,242,109,.42);}}
+.sr-forecast-head .sub{{font:9px 'JetBrains Mono';color:#B7C99D;margin-top:3px;}}
+[data-testid="stSidebarHeader"]{{display:none!important;}}
+[data-testid="stSidebar"] > div:first-child{{padding-top:.8rem!important;}}
 .sr-tabline{{border:1px solid #405334;border-radius:12px;padding:8px;background:rgba(5,17,31,.82);margin:6px 0 12px;}}
 .sr-ai-strip{{border:1px solid #768C45;border-radius:13px;padding:12px 14px;background:linear-gradient(100deg,rgba(86,47,141,.25),rgba(7,22,39,.95));box-shadow:0 0 25px rgba(213,242,109,.09);margin-bottom:10px;}}
 .sr-ai-grid{{display:grid;grid-template-columns:1.4fr .7fr .7fr;gap:10px;align-items:center;}}
@@ -3548,15 +3553,42 @@ def render_weather_dashboard() -> None:
     hours = [f"+{hour}h" for hour in range(0, 7)]
     temperatures = [round(temperature_c + math.sin((hour + 1) / 2.2) * 1.8 - hour * .28, 1) for hour in range(7)]
     precipitation = [int(clamp(precip_probability + math.sin(hour * 1.2) * 18 - hour * 3, 0, 100)) for hour in range(7)]
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=hours, y=temperatures, mode="lines+markers", name="Temperature °C", line=dict(width=3)))
-    fig.add_trace(go.Bar(x=hours, y=precipitation, name="Precipitation %", opacity=.42, yaxis="y2"))
-    fig.update_layout(
-        yaxis=dict(title="°C", showgrid=False),
-        yaxis2=dict(title="%", overlaying="y", side="right", range=[0, 100], showgrid=False),
-        title="Next 6 hours · operational forecast",
+    st.markdown(
+        '<div class="sr-forecast-head"><div class="title">Next 6 hours · operational forecast</div>'
+        '<div class="sub">Temperature trend, precipitation probability and road-operability outlook</div></div>',
+        unsafe_allow_html=True,
     )
-    st.plotly_chart(transparent_plot_layout(fig, 235), use_container_width=True, config={"displayModeBar": False})
+    fig = go.Figure()
+    # Low-opacity underlays create a restrained neon glow without reducing legibility.
+    fig.add_trace(go.Scatter(x=hours, y=temperatures, mode="lines", showlegend=False, hoverinfo="skip", line=dict(width=15, color="rgba(213,242,109,.07)")))
+    fig.add_trace(go.Scatter(x=hours, y=temperatures, mode="lines", showlegend=False, hoverinfo="skip", line=dict(width=8, color="rgba(213,242,109,.14)")))
+    fig.add_trace(go.Scatter(
+        x=hours, y=temperatures, mode="lines+markers", name="Temperature °C",
+        line=dict(width=3, color="#D5F26D"),
+        marker=dict(size=8, color="#D5F26D", line=dict(width=1, color="#F2F6E8")),
+    ))
+    fig.add_trace(go.Bar(
+        x=hours, y=precipitation, name="Precipitation %", yaxis="y2",
+        marker=dict(color="rgba(82,161,190,.48)", line=dict(color="#52A1BE", width=1)),
+    ))
+    fig.update_layout(
+        height=255,
+        margin=dict(l=12, r=12, t=56, b=18),
+        paper_bgcolor="rgba(6,17,14,.97)",
+        plot_bgcolor="rgba(6,17,14,.74)",
+        font=dict(color=TEXT, family="Poppins"),
+        legend=dict(
+            orientation="h", yanchor="bottom", y=1.03, xanchor="left", x=0,
+            bgcolor="rgba(6,17,14,.78)", bordercolor="rgba(213,242,109,.30)", borderwidth=1,
+            font=dict(size=10),
+        ),
+        xaxis=dict(showgrid=False, zeroline=False, color=MUTED),
+        yaxis=dict(title="°C", showgrid=True, gridcolor="rgba(213,242,109,.08)", zeroline=False, color=MUTED),
+        yaxis2=dict(title="%", overlaying="y", side="right", range=[0, 100], showgrid=False, zeroline=False, color=BLUE),
+        bargap=.42,
+        shapes=[dict(type="rect", xref="paper", yref="paper", x0=0, y0=0, x1=1, y1=1, line=dict(color="rgba(213,242,109,.62)", width=1), fillcolor="rgba(0,0,0,0)")],
+    )
+    st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
 
 
 def render_prevention_factor_chart() -> None:
@@ -3853,13 +3885,6 @@ def page_central() -> None:
                 log_event(f"Incident opened from command queue: {incident.id}", "incident")
                 st.rerun()
 
-    weather_col, risk_col = st.columns([1.15, 1])
-    with weather_col:
-        render_weather_dashboard()
-    with risk_col:
-        st.markdown('<div class="sr-panel"><div class="sr-title">SkyRoute AI · city risk monitor</div><div class="sr-body">The agent continuously combines weather, road wetness, traffic, ordinary crashes and HazMat flow to identify preventable escalation.</div></div>', unsafe_allow_html=True)
-        render_prevention_factor_chart()
-
     selected_alert = next((item for item in preventive_alerts if item.id == st.session_state.selected_alert_id), None)
     if selected_alert:
         p1, p2 = st.columns([5.2, 1])
@@ -3932,6 +3957,20 @@ def page_central() -> None:
                 st.session_state.plan_confirmed = False
                 log_event(f"Incident opened from city map: {chosen_id}", "incident")
                 st.rerun()
+        city_legend: List[Tuple[str, str, str]] = [
+            ("⚠", "Hazardous-material incident", "#F26457"),
+            ("T", "HazMat vehicle", "#768C45"),
+            ("X", "Ordinary road incident", "#F26457"),
+            ("", "Live traffic condition", "#52A1BE"),
+            ("", "HazMat corridor", "#A9BF5A"),
+            ("🌿", "Environmental / protected receptor", "#A9BF5A"),
+        ]
+        if selected_alert:
+            city_legend += [
+                ("", "Selected high-risk road segment", "#F26457"),
+                ("", "AI preventive alternative", "#D5F26D"),
+            ]
+        render_map_legend(city_legend, "Citywide operational map legend")
         st.caption("Click an incident marker to open its command workspace. Preventive previews visibly highlight the affected segment and the AI alternative.")
 
     with alert_col:
@@ -3954,6 +3993,14 @@ def page_central() -> None:
             if b2.button("✓ Applied" if is_applied else "Apply prevention", key=f"apply-alert-{alert.id}", disabled=is_applied, type="primary" if not is_applied else "secondary", use_container_width=True):
                 add_prevention_action(alert)
                 st.rerun()
+
+    st.markdown('<div class="sr-h2">Operational weather and predictive contribution</div>', unsafe_allow_html=True)
+    weather_col, risk_col = st.columns([1.15, 1])
+    with weather_col:
+        render_weather_dashboard()
+    with risk_col:
+        st.markdown('<div class="sr-panel"><div class="sr-title">SkyRoute AI · city risk monitor</div><div class="sr-body">The agent continuously combines weather, road wetness, traffic, ordinary crashes and HazMat flow to identify preventable escalation.</div></div>', unsafe_allow_html=True)
+        render_prevention_factor_chart()
 
 
 # =============================================================================
@@ -4390,6 +4437,13 @@ def page_traffic() -> None:
             "title": active.id, "details": active.description,
         }], 92, 17)
         render_map(make_deck(layers, active.lat, active.lon, 12.25, 35, -8, use_basemap), "traffic-control-map", 675)
+        render_map_legend([
+            ("!", "Active incident", "#F26457"),
+            ("T", "HazMat vehicle", "#768C45"),
+            ("X", "Ordinary traffic incident", "#F26457"),
+            ("", "Live traffic condition", "#52A1BE"),
+            ("", "Previewed closure / diversion / priority corridor", "#D5F26D"),
+        ], "Traffic-control map legend")
         st.info(f"Preview: **{preview.title}**. All previously selected population and environmental measures remain overlaid for conflict checking.")
 
     with control_col:
@@ -4440,6 +4494,15 @@ def page_environment() -> None:
             "title": active.id, "details": incident_state["substance"]["environment"],
         }], 92, 17)
         render_map(make_deck(layers, active.lat, active.lon, 12.65, 38, -8, use_basemap), "environment-protection-map", 675)
+        render_map_legend([
+            ("!", "Active incident", "#F26457"),
+            ("", "Air-impact / toxic-plume zone", "#F26457"),
+            ("💧", "Water or ecological receptor", "#52A1BE"),
+            ("D", "Drain / stormwater pathway", "#D5F26D"),
+            ("S", "Environmental sensor", "#A9BF5A"),
+            ("🌿", "Protected / environmental area", "#A9BF5A"),
+            ("", "Previewed environmental action", "#D5F26D"),
+        ], "Environmental-protection map legend")
         st.info(f"Preview: **{preview.title}**. Selected population and traffic actions stay visible to reveal overlaps with drains, sensors and containment areas.")
         st.caption(f"Public environmental polygons: {PROTECTED_AREA_SOURCE}. These complement the statutory planning references but are not represented as official ecological-redline boundaries.")
 
