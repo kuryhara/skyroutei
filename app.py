@@ -214,12 +214,12 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-top{{border-color:#768C45;background:linear-gradient(135deg,rgba(24,39,29,.97),rgba(6,17,14,.99));}}
 .sr-logo{{display:none;}}
 .sr-map-info-anchor{{position:relative;height:0;z-index:999;pointer-events:none;}}
-.sr-map-info-control{{position:absolute;right:12px;top:12px;pointer-events:auto;}}
+.sr-map-info-control{{position:absolute;right:14px;pointer-events:auto;}}
 .sr-map-info-control summary{{list-style:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:rgba(5,15,28,.96);border:1px solid #FFFFFF;color:#FFFFFF;font:700 14px 'Poppins';box-shadow:0 0 13px rgba(255,255,255,.22),0 0 20px rgba(0,229,255,.11);user-select:none;}}
 .sr-map-info-control summary::-webkit-details-marker{{display:none;}}
 .sr-map-info-control summary:hover{{border-color:#00E5FF;color:#00E5FF;box-shadow:0 0 16px rgba(0,229,255,.42);}}
 .sr-map-info-control[open] summary{{border-color:#00E5FF;color:#00E5FF;}}
-.sr-map-info-panel{{position:absolute;right:0;top:38px;width:255px;border:1px solid #00E5FF;border-radius:10px;padding:10px 11px;background:rgba(4,13,24,.98);color:#DCE9F2;box-shadow:0 12px 34px rgba(0,0,0,.48),0 0 20px rgba(0,229,255,.12);font:9px 'JetBrains Mono';line-height:1.55;}}
+.sr-map-info-panel{{position:absolute;right:0;bottom:38px;width:255px;border:1px solid #00E5FF;border-radius:10px;padding:10px 11px;background:rgba(4,13,24,.98);color:#DCE9F2;box-shadow:0 12px 34px rgba(0,0,0,.48),0 0 20px rgba(0,229,255,.12);font:9px 'JetBrains Mono';line-height:1.55;}}
 .sr-map-info-panel b{{display:block;color:#FFFFFF;font:700 11px 'Poppins';margin-bottom:5px;}}
 .sr-map-legend{{border:1px solid #405334;border-radius:12px;padding:10px 12px;background:rgba(6,17,14,.94);margin:7px 0 12px;}}
 .sr-map-legend-title{{font-family:'Poppins';font-size:11px;font-weight:700;color:#D5F26D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}}
@@ -2647,11 +2647,15 @@ def make_deck(
     )
 
 
-def render_map_info() -> None:
+def render_map_info(height: int) -> None:
+    # The anchor is rendered immediately before the PyDeck canvas. Positioning
+    # the control by the chart height keeps it inside the map's lower-right
+    # corner and away from the native zoom/navigation controls.
+    top_offset = max(18, int(height) - 50)
     st.markdown(
-        """
+        f"""
         <div class="sr-map-info-anchor">
-          <details class="sr-map-info-control">
+          <details class="sr-map-info-control" style="top:{top_offset}px">
             <summary title="Map help — hover for object details or click to open instructions">i</summary>
             <div class="sr-map-info-panel">
               <b>Map interaction</b>
@@ -2672,7 +2676,7 @@ def render_map(
     height: int = 590,
     selectable: bool = False,
 ) -> Any:
-    render_map_info()
+    render_map_info(height)
     try:
         if selectable:
             return st.pydeck_chart(
@@ -2687,7 +2691,7 @@ def render_map(
         return None
     except Exception as exc:
         st.error(f"The map could not be rendered: {exc}")
-        st.caption("Try disabling the CARTO basemap in Operational controls. The operational overlays will still render.")
+        st.caption("The operational overlays can still render even when the basemap service is unavailable.")
         return None
 
 
@@ -3236,49 +3240,23 @@ def render_agent_workflow_tracker() -> None:
 active = active_incident()
 now = datetime.now()
 
-# Main navigation replaces the former permanent left sidebar.
+# Compact page navigation. Incidents are selected only through the visible
+# incident cards/buttons, avoiding a duplicate combobox in the header.
 def sync_navigation_from_widget() -> None:
     st.session_state.nav_page = st.session_state.nav_widget
 
 if st.session_state.get("nav_widget") != st.session_state.nav_page:
     st.session_state.nav_widget = st.session_state.nav_page
 
-nav_col, incident_col = st.columns([2.25, 1])
-with nav_col:
-    st.radio(
-        "Operational workspace",
-        NAVIGATION,
-        key="nav_widget",
-        on_change=sync_navigation_from_widget,
-        horizontal=True,
-        label_visibility="collapsed",
-    )
+st.radio(
+    "Operational workspace",
+    NAVIGATION,
+    key="nav_widget",
+    on_change=sync_navigation_from_widget,
+    horizontal=True,
+    label_visibility="collapsed",
+)
 page = st.session_state.nav_page
-
-incident_index = next((idx for idx, inc in enumerate(INCIDENTS) if inc.id == active.id), 0)
-with incident_col:
-    selected_incident_idx = st.selectbox(
-        "Selected incident",
-        range(len(INCIDENTS)),
-        index=incident_index,
-        format_func=lambda idx: f"{INCIDENTS[idx].id} · {INCIDENTS[idx].substance}",
-        label_visibility="collapsed",
-    )
-
-if INCIDENTS[selected_incident_idx].id != st.session_state.active_incident_id:
-    st.session_state.active_incident_id = INCIDENTS[selected_incident_idx].id
-    st.session_state.plan_confirmed = False
-    st.session_state.plan_decisions = {}
-    st.session_state.resource_quantities = {kind: 0 for kind in AGENCY_LABEL}
-    st.session_state.selected_resource_ids = {}
-    st.session_state.selected_routes = {}
-    st.session_state.selected_mission_target_ids = {}
-    st.session_state.dispatch_status = {}
-    st.session_state.historical_stage = 0
-    st.session_state.nav_page = "Incident Command"
-    st.session_state.incident_tab = "Live Case Simulation" if INCIDENTS[selected_incident_idx].id == HISTORICAL_INCIDENT_ID else "Overview"
-    log_event(f"Incident selected: {INCIDENTS[selected_incident_idx].id}", "incident")
-    st.rerun()
 active = active_incident()
 
 _context = incident_context_bundle(active)
@@ -3298,67 +3276,34 @@ for resource in RESOURCES:
 if "ors_api_key_input" not in st.session_state:
     st.session_state.ors_api_key_input = get_ors_key()
 
-with st.expander("Operational controls · data, map layers and scenario", expanded=False):
-    data_tab, layers_tab, scenario_tab = st.tabs(["Data & routing", "Map layers", "Scenario assumptions"])
-    with data_tab:
-        data_col, route_col, base_col = st.columns([1, 1.35, .9])
-        with data_col:
-            data_mode = st.selectbox("Traffic source", ["Simulated live", "AMap live if configured"])
-        with route_col:
-            routing_backend = st.selectbox(
-                "Routing backend",
-                ["OpenRouteService local real streets", "Automatic real streets", "AMap live route", "OSMnx real streets", "OSRM public real streets"],
-                help="The local OpenRouteService returns road-network GeoJSON from the Jiangsu graph running in Docker.",
-            )
-        with base_col:
-            use_basemap = st.toggle("CARTO dark basemap", value=True)
+# Fixed operational configuration. The former “Operational controls” expander
+# and its low-value duplicate inputs were removed from the public interface.
+data_mode = "Simulated live"
+routing_backend = "Automatic real streets"
+use_basemap = True
+ors_api_key = "" if ors_is_local() else get_ors_key()
 
-        if ors_is_local():
-            ors_api_key = ""
-            health = fetch_ors_health()
-            if health.get("ok"):
-                st.success("Local OpenRouteService ready · Jiangsu graph")
-            else:
-                st.warning(f"Local OpenRouteService: {health.get('status', 'not reachable')}")
-        else:
-            ors_api_key = st.text_input(
-                "OpenRouteService API key",
-                key="ors_api_key_input",
-                type="password",
-                help="Only required when ORS_BASE_URL points to the remote HeiGIT service.",
-            )
+show_population_layer = True
+show_resources_layer = True
+show_routes_layer = True
+show_traffic_layer = True
+show_water_layer = True
+show_environment_layer = True
+show_labels_layer = True
+show_3d_buildings = False
+show_worldpop_3d = False
 
-    with layers_tab:
-        l1, l2, l3 = st.columns(3)
-        with l1:
-            show_population_layer = st.toggle("Vulnerable populations and facilities", value=True)
-            show_resources_layer = st.toggle("Emergency bases and active units", value=True)
-            show_routes_layer = st.toggle("Mission routes", value=True)
-        with l2:
-            show_traffic_layer = st.toggle("Traffic and road controls", value=True)
-            show_water_layer = st.toggle("Water bodies", value=True)
-            show_environment_layer = st.toggle("Environmental protection areas", value=True)
-        with l3:
-            show_labels_layer = st.toggle("Map symbols and labels", value=True)
-            show_3d_buildings = st.toggle("Illustrative 3D urban context", value=False)
-            show_worldpop_3d = st.toggle("WorldPop 2020 · illustrative 3D", value=False)
-
-    with scenario_tab:
-        st.markdown('<div class="sr-control-note">Simulation inputs and decision assumptions. These controls remain available without occupying a permanent side panel.</div>', unsafe_allow_html=True)
-        s1, s2, s3 = st.columns(3)
-        with s1:
-            wind_speed_kmh = st.slider("Wind speed (km/h)", 2, 45, 16)
-            wind_direction = st.slider("Wind direction (degrees)", 0, 359, 115)
-            rain_mm_h = st.slider("Rainfall (mm/h)", 0, 80, 18)
-        with s2:
-            temperature_c = st.slider("Temperature (°C)", 5, 45, 34)
-            road_wetness = st.slider("Road wetness", 0.0, 1.0, 0.65, 0.05)
-            traffic_index = st.slider("Traffic index", 0.0, 10.0, 7.4, 0.1)
-            hazmat_flow = st.slider("HazMat trucks per hour", 0, 80, 28)
-        with s3:
-            evacuation_capacity_ppm = st.slider("Evacuation capacity (people/min)", 20, 300, 95)
-            setup_delay_min = st.slider("Mobilisation delay (min)", 1, 30, 7)
-            shelter_quality = st.slider("Shelter quality", 0.2, 0.95, 0.68, 0.01)
+# Stable scenario inputs used by the prevention and live-incident models.
+wind_speed_kmh = 16
+wind_direction = 115
+rain_mm_h = 18
+temperature_c = 34
+road_wetness = 0.65
+traffic_index = 7.4
+hazmat_flow = 28
+evacuation_capacity_ppm = 95
+setup_delay_min = 7
+shelter_quality = 0.68
 
 amap_key = get_amap_key()
 if data_mode.startswith("AMap") or routing_backend.startswith("AMap"):
