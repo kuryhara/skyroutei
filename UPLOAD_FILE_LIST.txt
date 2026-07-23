@@ -1,0 +1,27 @@
+UPLOAD ALL ITEMS TO THE ROOT OF THE EXISTING main BRANCH
+
+Root:
+  index.html
+  favicon.png
+  og.png
+  README_DEPLOY.md
+  UPLOAD_FILE_LIST.txt
+
+assets/:
+  index-BCa5wIdb.js
+  index-Dj5p-Zhz.css
+  map-view-ZcmVp-bL.js
+  skyroute-enhancements.css
+  skyroute-enhancements.js
+
+data/:
+  g40-street-fallback-v1.geojson
+  nanjing-basemap-v1.pmtiles
+  nanjing-risk-v1.pmtiles
+
+Do not flatten the assets/ or data/ folders. The site uses relative paths.
+
+After uploading, enable GitHub Pages:
+  Settings > Pages > Deploy from a branch > main > / (root)
+
+The former Python and requirements files are not used by this static build.
