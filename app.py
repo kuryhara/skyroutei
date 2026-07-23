@@ -1,6 +1,6 @@
 """
-SkyRoute / 天途 v28 — Compatible Map Labels and Compact Resource Text
-==================================================================
+SkyRoute / 天途 v29 — Clear Plan Map Context
+============================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
 traffic control, environmental response and executive presentation.
@@ -3316,8 +3316,13 @@ def local_flat_building_context() -> List[Dict[str, Any]]:
     return output
 
 
-def urban_context_layers(prefix: str) -> List[pdk.Layer]:
-    """Return quiet, flat context layers beneath operational overlays."""
+def urban_context_layers(prefix: str, filled: bool = True) -> List[pdk.Layer]:
+    """Return quiet, flat context layers beneath operational overlays.
+
+    The consolidated Plan view deliberately uses outline-only context. Large
+    OSM land-use polygons (especially residential/construction polygons) can
+    otherwise cover most of the operational canvas and obscure routes.
+    """
     layers: List[pdk.Layer] = []
     landuse, buildings, _ = load_public_urban_context(active.lat, active.lon)
     if show_landuse_layer and not landuse:
@@ -3332,7 +3337,7 @@ def urban_context_layers(prefix: str) -> List[pdk.Layer]:
             get_polygon="polygon",
             get_fill_color="fill_color",
             get_line_color="line_color",
-            filled=True,
+            filled=filled,
             stroked=True,
             line_width_min_pixels=1,
             pickable=True,
@@ -3346,7 +3351,7 @@ def urban_context_layers(prefix: str) -> List[pdk.Layer]:
             get_polygon="polygon",
             get_fill_color="fill_color",
             get_line_color="line_color",
-            filled=True,
+            filled=filled,
             stroked=True,
             line_width_min_pixels=1,
             pickable=True,
@@ -5596,7 +5601,9 @@ def reset_demo() -> None:
 
 def consolidated_map_layers() -> List[pdk.Layer]:
     """Build the complete operational map without hiding existing decision layers."""
-    layers: List[pdk.Layer] = urban_context_layers("plan")
+    # Keep land-use and building boundaries available for orientation while
+    # preventing a large context polygon from masking the operational map.
+    layers: List[pdk.Layer] = urban_context_layers("plan", filled=False)
 
     if show_environment_layer:
         layers.extend(public_environment_layers("plan"))
