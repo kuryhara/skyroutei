@@ -1,5 +1,5 @@
 """
-SkyRoute / 天途 v27 — Clean Map Chrome and Visible Unit Status
+SkyRoute / 天途 v28 — Compatible Map Labels and Compact Resource Text
 ==================================================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
@@ -133,8 +133,6 @@ section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] .stMark
 .sr-top-actions{{display:flex;align-items:center;gap:7px;margin-left:auto;flex:0 0 auto;}}
 .sr-top-link{{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(213,242,109,.48);border-radius:8px;background:rgba(213,242,109,.055);color:#F2F6E8!important;text-decoration:none!important;font:700 9px 'JetBrains Mono';white-space:nowrap;transition:.16s ease;}}
 .sr-top-link:hover{{border-color:#D5F26D;background:rgba(213,242,109,.14);box-shadow:0 0 15px rgba(213,242,109,.12);transform:translateY(-1px);}}
-.sr-top-link.presentation{{background:#D5F26D;color:#06110E!important;border-color:#D5F26D;}}
-.sr-top-link.presentation:hover{{background:#E4FA8E;box-shadow:0 0 18px rgba(213,242,109,.28);}}
 @media(max-width:1180px){{.sr-top{{align-items:flex-start;}}.sr-top-right{{width:100%;flex-basis:100%;}}.sr-topstats{{gap:14px;}}.sr-top-actions{{margin-left:auto;}}}}
 .sr-card {{border:1px solid {LINE};border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,rgba(8,24,42,.98),rgba(4,13,25,.98));box-shadow:inset 0 1px rgba(255,255,255,.025);min-height:86px;}}
 .sr-card .k {{font:9px 'JetBrains Mono';color:{MUTED};text-transform:uppercase;letter-spacing:.06em;}}
@@ -161,6 +159,11 @@ button[kind="primary"] {{background:linear-gradient(135deg,{CYAN},{TEAL})!import
 [data-testid="stMetricValue"] {{font-family:'Poppins';min-width:0;overflow:hidden;}}
 [data-testid="stMetricValue"] p {{font-family:'Poppins'!important;font-size:15px!important;line-height:1.15!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;margin:0!important;}}
 [data-testid="stMetricDelta"] p {{font-size:9px!important;line-height:1.2!important;white-space:normal!important;}}
+div[class*="st-key-resource_metric_"] [data-testid="stMetricValue"] p {{
+ font:600 10px/1.22 'JetBrains Mono'!important;
+ letter-spacing:-.015em!important;
+ overflow-wrap:anywhere!important;
+}}
 [data-testid="stChatMessage"] {{border:1px solid {LINE};border-radius:12px;background:rgba(6,19,34,.72);}}
 .sr-footer {{border-top:1px solid {LINE};padding:15px;text-align:center;color:{MUTED};font:9.5px 'JetBrains Mono';line-height:1.6;margin-top:22px;}}
 .sr-weather{{border:1px solid #52A1BE;border-radius:14px;padding:14px;background:linear-gradient(135deg,rgba(20,63,101,.88),rgba(5,18,34,.96));box-shadow:0 0 28px rgba(213,242,109,.08);}}
@@ -2912,7 +2915,9 @@ def text_layer(
         get_alignment_baseline="'center'",
         get_text_anchor="'middle'",
         font_family="Arial",
-        character_set=list("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+!OX-"),
+        # A tuple is deliberate: pydeck interprets a list of strings as a
+        # JavaScript accessor expression, which Deck.gl cannot iterate here.
+        character_set=tuple("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+!OX-"),
         billboard=True,
         parameters={"depthTest": False},
         pickable=False,
@@ -3100,7 +3105,7 @@ def route_direction_layers(layer_id: str, data: List[Dict[str, Any]]) -> List[pd
         size_units="pixels",
         billboard=True,
         font_family="Arial",
-        character_set=["➤"],
+        character_set=("➤",),
         pickable=False,
         parameters={"depthTest": False},
     )
@@ -4148,7 +4153,6 @@ st.markdown(
   </div>
   <div class="sr-top-actions">
    <a class="sr-top-link" href="?view=data" target="_self">Data</a>
-   <a class="sr-top-link presentation" href="?view=presentation" target="_self">▶ Presentation</a>
   </div>
  </div>
 </div>
@@ -4320,6 +4324,14 @@ def moving_unit_label_layers(prefix: str, data: List[Dict[str, Any]]) -> List[pd
     ]
     if not labels:
         return []
+    # Build a literal glyph set from the visible labels. Pydeck treats a plain
+    # string (including "auto") or a list of strings as an accessor function;
+    # a tuple serializes as the actual iterable expected by Deck.gl TextLayer.
+    character_set = tuple(sorted({
+        character
+        for item in labels
+        for character in str(item.get("unit_label", ""))
+    }))
     return [
         pdk.Layer(
             "TextLayer",
@@ -4338,7 +4350,7 @@ def moving_unit_label_layers(prefix: str, data: List[Dict[str, Any]]) -> List[pd
             background_padding=[6, 4],
             billboard=True,
             font_family="Arial",
-            character_set="auto",
+            character_set=character_set,
             pickable=False,
             parameters={"depthTest": False},
         )
@@ -5090,7 +5102,11 @@ def render_decision_options(options: List[DecisionOption], preview_key: str) -> 
         m1, m2, m3 = st.columns(3)
         m1.metric("People protected", f"{option.people_protected:,}" if option.people_protected else "—")
         m2.metric("Traffic impact", option.traffic_impact)
-        m3.metric("Resources", option.resource_need[:28] + ("…" if len(option.resource_need) > 28 else ""))
+        with m3:
+            # The keyed wrapper keeps this longer value compact without
+            # shrinking every metric in the operational interface.
+            with st.container(key=f"resource_metric_{option.id}"):
+                st.metric("Resources", option.resource_need[:28] + ("…" if len(option.resource_need) > 28 else ""))
         with st.expander("Why, requirements and map consequence"):
             st.write(f"**Agent reason:** {option.agent_reason}")
             st.write(f"**Resources:** {option.resource_need}")
@@ -6935,7 +6951,7 @@ PAGE_FUNCTIONS.get(page, page_central)()
 st.markdown(
     """
 <div class="sr-footer">
-SkyRoute / 天途 v27 · live vulnerability-aware emergency decision demonstrator.<br/>
+SkyRoute / 天途 v28 · live vulnerability-aware emergency decision demonstrator.<br/>
 Default positions, traffic, population estimates, plume geometry, hospital capacity and response scores are simulation inputs. The Huai'an 2005 scenario is presented as a live incident simulation based on a real event; operational map anchors and changing weather inputs remain modeling assumptions. No real dispatch is performed.<br/>
 Production deployment requires official emergency plans, validated vulnerability and dispersion models, licensed data, secure platform integration and final human command authority.
 </div>
