@@ -40,15 +40,26 @@ Use **▶ Presentation** in the upper-right corner. The guided case study covers
 4. continuous replanning;
 5. agent orchestration and human approval.
 
+Presentation keeps the operational screens and their decision controls active.
+On the route-comparison step, **FASTEST** and **LOWEST EXPOSURE** remain
+simultaneously visible on the map, with distinct colors, direct labels and
+directional chevrons. Response-unit markers remain visible as the scenario
+advances.
+
 The pitch metrics are explicitly identified as scenario estimates. The
 application does not claim predicted lives saved or perform real dispatch.
 
 ## Map context
 
-When OSMnx and an internet connection are available, the **land use** and
-**buildings** switches request OpenStreetMap context. Building footprints are
-flat visual boundaries only; no height, occupancy or structural condition is
-inferred, and they do not affect the routing or risk models.
+Use the compact **Layers** button to open or close the optional map context.
+When OSMnx and an internet connection are available, **land use** and
+**buildings** request OpenStreetMap context. The offline presentation fallback
+is identified as illustrative context. Building footprints are flat visual
+boundaries only; no height, occupancy or structural condition is inferred, and
+they do not affect the routing or risk models.
+
+The small map bar keeps north orientation on the upper-left and exposes source,
+interaction and modeling notes only through the `i` control.
 
 Production use requires authorized operational feeds, validated models,
 licensed integrations and final human command authority.
