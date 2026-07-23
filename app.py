@@ -1,5 +1,5 @@
 """
-SkyRoute / 天途 v14 — Live Vulnerability-Aware Emergency Decision Agent
+SkyRoute / 天途 v16 — Live Vulnerability-Aware Emergency Decision Agent
 ==================================================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
@@ -78,7 +78,7 @@ except ImportError:  # pragma: no cover
 # PAGE AND VISUAL SYSTEM
 # =============================================================================
 st.set_page_config(
-    page_title="SkyRoute v14 | SkyTech CCO",
+    page_title="SkyRoute v16 | SkyTech CCO",
     page_icon="🛰️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -227,6 +227,7 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-map-legend-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px 12px;}}
 .sr-map-legend-item{{display:flex;align-items:center;gap:8px;font-size:10px;color:#D6E2C6;line-height:1.3;}}
 .sr-legend-symbol{{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:13px;font-weight:700;border:1px solid rgba(242,246,232,.45);flex:0 0 18px;}}
+.sr-legend-incident-icon{{width:20px;height:20px;display:block;object-fit:contain;filter:drop-shadow(0 0 5px rgba(226,84,61,.42));flex:0 0 20px;}}
 .sr-workflow{{position:sticky;top:.7rem;border:1px solid #405334;border-radius:14px;padding:14px 11px;background:linear-gradient(180deg,rgba(8,19,15,.98),rgba(4,11,8,.98));box-shadow:0 0 28px rgba(213,242,109,.06);}}
 .sr-workflow-title{{font:9px 'JetBrains Mono';color:#B7C99D;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;}}
 .sr-workflow-item{{display:grid;grid-template-columns:32px 1fr;gap:9px;position:relative;min-height:58px;opacity:.42;}}
@@ -423,6 +424,19 @@ MAP_SYMBOL_GLYPH = {
     "protected": "Z",
     "target": "T",
 }
+
+# Incident marker rendered with a self-contained SVG data URI. The TextLayer
+# fallback is always placed underneath the IconLayer: when the SVG texture
+# loads, the opaque red icon covers it; when a browser or deployment blocks
+# IconLayer textures, the warning glyph remains visible at the same location.
+ALERT_ICON_DATA_URI = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJBbGVydCAvIGluY2lkZW50IGljb24iPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjMwIiBmaWxsPSIjRTI1NDNEIiBzdHJva2U9IiMwQjEyMjAiIHN0cm9rZS13aWR0aD0iMy41Ii8+CiAgPHJlY3QgeD0iMjguNSIgeT0iMTQiIHdpZHRoPSI3IiBoZWlnaHQ9IjI2IiByeD0iMy41IiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSI0NyIgcj0iNC42IiBmaWxsPSIjRkZGRkZGIi8+Cjwvc3ZnPgo="
+ALERT_ICON_MAPPING = {
+    "url": ALERT_ICON_DATA_URI,
+    "width": 64,
+    "height": 64,
+    "anchorY": 64,
+}
+INCIDENT_LEGEND_TOKEN = "__INCIDENT_ICON__"
 
 
 INCIDENTS: List[Incident] = [
@@ -2689,6 +2703,63 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
     ]
 
 
+def incident_icon_layers(
+    layer_prefix: str,
+    data: List[Dict[str, Any]],
+    get_size: int = 4,
+    size_scale: int = 13,
+) -> List[pdk.Layer]:
+    """Render a custom incident icon with a client-side visual fallback.
+
+    The fallback layer is deliberately inserted first. If the IconLayer image
+    texture loads, the opaque SVG covers the warning glyph. If it does not,
+    the TextLayer remains visible without changing incident data or tooltips.
+    """
+    incidents_with_icon: List[Dict[str, Any]] = []
+    for raw in data:
+        item = dict(raw)
+        item["icon_data"] = dict(ALERT_ICON_MAPPING)
+        item["fallback_glyph"] = "⚠️"
+        item.setdefault("title", item.get("name", "Incident"))
+        item.setdefault("details", item.get("description", "Active incident"))
+        incidents_with_icon.append(item)
+
+    fallback_layer = pdk.Layer(
+        "TextLayer",
+        id=f"{layer_prefix}-fallback",
+        data=incidents_with_icon,
+        get_position="[lon, lat]",
+        get_text="fallback_glyph",
+        get_size=18,
+        size_units="pixels",
+        size_min_pixels=16,
+        size_max_pixels=24,
+        get_color=[255, 255, 255, 255],
+        get_pixel_offset=[0, -26],
+        get_alignment_baseline="center",
+        get_text_anchor="middle",
+        billboard=True,
+        pickable=False,
+    )
+    icon_layer = pdk.Layer(
+        "IconLayer",
+        id=f"{layer_prefix}-points",
+        data=incidents_with_icon,
+        icon_mapping=None,
+        get_icon="icon_data",
+        get_position="[lon, lat]",
+        get_size=get_size,
+        size_scale=size_scale,
+        size_min_pixels=34,
+        size_max_pixels=64,
+        billboard=True,
+        pickable=True,
+        auto_highlight=True,
+        highlight_color=[255, 255, 255, 110],
+    )
+    return [fallback_layer, icon_layer]
+
+
 def path_layer(layer_id: str, data: List[Dict[str, Any]], width: int = 7, color: Any = "color", pickable: bool = True) -> pdk.Layer:
     return pdk.Layer(
         "PathLayer",
@@ -2861,7 +2932,9 @@ def render_map_legend(items: List[Tuple[str, str, str]], title: str = "Map legen
         return
     rendered = []
     for symbol, label, color in items:
-        if symbol == "━":
+        if symbol == INCIDENT_LEGEND_TOKEN:
+            swatch = f'<img class="sr-legend-incident-icon" src="{ALERT_ICON_DATA_URI}" alt="Incident"/>'
+        elif symbol == "━":
             swatch = f'<span class="sr-map-legend-route" style="background:{color};color:{color}"></span>'
         elif symbol == "▰":
             swatch = f'<span class="sr-map-legend-area" style="background:{color}"></span>'
@@ -4173,7 +4246,7 @@ def page_central() -> None:
             **acc, "type": "traffic_incident", "color": [255, 209, 102, 230] if acc["severity"] == "minor" else [255, 89, 94, 235],
             "glyph": MAP_SYMBOL_GLYPH["traffic_incident"], "title": acc["title"], "details": f"{acc['road']}<br/>Severity: {acc['severity']}",
         } for acc in ORDINARY_ACCIDENTS], 60, 11)
-        layers += point_layers("incidents", incident_map_data(), 145, 16)
+        layers += incident_icon_layers("incidents", incident_map_data(), get_size=4, size_scale=13)
 
         center_lat, center_lon, map_zoom = 32.160, 118.704, 11.35
         if selected_alert:
@@ -4205,7 +4278,7 @@ def page_central() -> None:
                 log_event(f"Incident opened from city map: {chosen_id}", "incident")
                 st.rerun()
         city_legend: List[Tuple[str, str, str]] = [
-            (MAP_SYMBOL_GLYPH["incident"], "Hazardous-material incident", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Hazardous-material incident", "#FF595E"),
             (MAP_SYMBOL_GLYPH["truck"], "HazMat vehicle", "#FF2D95"),
             (MAP_SYMBOL_GLYPH["traffic_incident"], "Ordinary road incident", "#FF595E"),
             ("━", "Traffic: free / slow / congested", "#FFD166"),
@@ -4307,7 +4380,7 @@ def page_incident_overview() -> None:
             if show_labels_layer:
                 layers += point_layers("incident-resources", resources_data, 58, 20)
 
-        layers += point_layers("incident-marker", [{
+        layers += incident_icon_layers("incident-marker", [{
             "id": active.id,
             "lon": active.lon,
             "lat": active.lat,
@@ -4315,13 +4388,13 @@ def page_incident_overview() -> None:
             "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": f"{active.id} · {active.substance}",
             "details": f"Leak estimate: {incident_state['dynamic_leak']:.0f} kg/min<br/>{active.description}",
-        }], 100, 22)
+        }], get_size=4, size_scale=13)
 
         pitch = 42
         deck = make_deck(layers, active.lat, active.lon, 13.05, pitch, -12, use_basemap)
         render_map(deck, "incident-overview-map", 650)
         legend = [
-            (MAP_SYMBOL_GLYPH["incident"], "Accident source", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Accident source", "#FF595E"),
             ("▰", "Toxic plume", "#FF595E"),
             ("▰", "Isolation zone", "#FFD166"),
         ]
@@ -4468,14 +4541,14 @@ def page_population() -> None:
             } for shelter in SHELTERS], 72, 21)
             layers += point_layers("pop-hospitals", hospital_map_data(), 76, 22)
         layers += decision_overlay_layers("population-map", [preview])
-        layers += point_layers("population-incident", [{
+        layers += incident_icon_layers("population-incident", [{
             "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
-        }], 92, 22)
+        }], get_size=4, size_scale=13)
         pitch = 34
         render_map(make_deck(layers, active.lat, active.lon, 12.45, pitch, -8, use_basemap), "population-protection-map", 680)
         population_legend: List[Tuple[str, str, str]] = [
-            (MAP_SYMBOL_GLYPH["incident"], "Accident source", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Accident source", "#FF595E"),
             (MAP_SYMBOL_GLYPH["community"], "Priority community / village", "#FF9F1C"),
             (MAP_SYMBOL_GLYPH["school"], "School", "#FFD166"),
             (MAP_SYMBOL_GLYPH["community"], "Elder-care facility", "#B46AFF"),
@@ -4628,10 +4701,10 @@ def page_dispatch() -> None:
             layers += point_layers("dispatch-target", target_marker, 92, 23)
             layers += point_layers("dispatch-hospitals", hospital_map_data(), 76, 22)
 
-        layers += point_layers("dispatch-incident", [{
+        layers += incident_icon_layers("dispatch-incident", [{
             "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
-        }], 96, 22)
+        }], get_size=4, size_scale=13)
 
         deployed = deployed_vehicle_data()
         if deployed:
@@ -4644,6 +4717,7 @@ def page_dispatch() -> None:
         dispatch_pitch = 38
         render_map(make_deck(layers, center_lat, center_lon, 12.35, dispatch_pitch, -8, use_basemap), "dispatch-resources-map", 690)
         render_map_legend([
+            (INCIDENT_LEGEND_TOKEN, "Incident / leak source", "#E2543D"),
             (AGENCY_GLYPH[agency], f"{AGENCY_LABEL[agency]} origin / active unit", "#%02X%02X%02X" % tuple(AGENCY_COLOR[agency])),
             (MAP_SYMBOL_GLYPH.get(_symbol_key_for_item(selected_target), "◎"), "Assigned mission destination", "#FFFFFF"),
             ("━", "AI recommended route", "#FFFFFF"),
@@ -4702,13 +4776,13 @@ def page_traffic() -> None:
             **acc, "type": "traffic_incident", "color": [255, 89, 94, 235], "glyph": MAP_SYMBOL_GLYPH["traffic_incident"], "title": acc["title"],
             "details": f"{acc['road']} · {acc['severity']}",
         } for acc in ORDINARY_ACCIDENTS], 58, 11)
-        layers += point_layers("traffic-active-incident", [{
+        layers += incident_icon_layers("traffic-active-incident", [{
             "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
-        }], 92, 17)
+        }], get_size=4, size_scale=13)
         render_map(make_deck(layers, active.lat, active.lon, 12.25, 35, -8, use_basemap), "traffic-control-map", 675)
         render_map_legend([
-            (MAP_SYMBOL_GLYPH["incident"], "Active incident", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Active incident", "#FF595E"),
             (MAP_SYMBOL_GLYPH["truck"], "HazMat vehicle", "#FF2D95"),
             (MAP_SYMBOL_GLYPH["traffic_incident"], "Ordinary traffic incident", "#FF595E"),
             ("━", "Traffic: free / slow / congested", "#FFD166"),
@@ -4762,13 +4836,13 @@ def page_environment() -> None:
             "details": f"Status: {sensor['status']}",
         } for sensor in SENSORS], 58, 11)
         layers += decision_overlay_layers("environment-map", [preview])
-        layers += point_layers("environment-active-incident", [{
+        layers += incident_icon_layers("environment-active-incident", [{
             "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": incident_state["substance"]["environment"],
-        }], 92, 17)
+        }], get_size=4, size_scale=13)
         render_map(make_deck(layers, active.lat, active.lon, 12.65, 38, -8, use_basemap), "environment-protection-map", 675)
         render_map_legend([
-            (MAP_SYMBOL_GLYPH["incident"], "Active incident", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Active incident", "#FF595E"),
             ("▰", "Air-impact / toxic-plume zone", "#FF595E"),
             ("▰", "Water or ecological receptor", "#00A8FF"),
             (MAP_SYMBOL_GLYPH["drain"], "Drain / stormwater pathway", "#00D9FF"),
@@ -4947,7 +5021,7 @@ def consolidated_map_layers() -> List[pdk.Layer]:
             19,
         )
 
-    layers += point_layers(
+    layers += incident_icon_layers(
         "plan-incident",
         [{
             "lon": active.lon,
@@ -4957,8 +5031,8 @@ def consolidated_map_layers() -> List[pdk.Layer]:
             "title": active.id,
             "details": active.description,
         }],
-        102,
-        23,
+        get_size=4,
+        size_scale=13,
     )
     return layers
 
@@ -4973,7 +5047,7 @@ def page_plan() -> None:
         deck = make_deck(consolidated_map_layers(), active.lat, active.lon, 12.3, pitch, -10, use_basemap)
         render_map(deck, "consolidated-plan-map", 690)
         legend_items: List[Tuple[str, str, str]] = [
-            (MAP_SYMBOL_GLYPH["incident"], "Incident / leak source", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Incident / leak source", "#FF595E"),
             ("▰", "Toxic plume and protective-action zone", "#FF595E"),
         ]
         if show_population_layer:
@@ -5463,16 +5537,16 @@ def page_historical_study() -> None:
             if show_labels_layer:
                 layers += point_layers("live-case-resources", resources_data, 56, 19)
 
-        layers += point_layers("live-case-incident", [{
+        layers += incident_icon_layers("live-case-incident", [{
             "lon": active.lon, "lat": active.lat, "color": [255, 89, 94, 250], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": "Accident source", "details": "Jinghu Expressway Huai'an section · liquid chlorine release",
-        }], 105, 23)
+        }], get_size=4, size_scale=13)
 
         pitch = 40
         deck = make_deck(layers, active.lat, active.lon, 12.4, pitch, -10, use_basemap)
         render_map(deck, "live-case-map", 680)
         live_legend: List[Tuple[str, str, str]] = [
-            (MAP_SYMBOL_GLYPH["incident"], "Leak source", "#FF595E"),
+            (INCIDENT_LEGEND_TOKEN, "Leak source", "#FF595E"),
             ("▰", "Current toxic-plume zone", "#FF595E"),
             (MAP_SYMBOL_GLYPH["community"], "Ranked vulnerable village", "#FF9F1C"),
             (MAP_SYMBOL_GLYPH["police"], "Police warning / road-control mission", "#00C4FF"),
