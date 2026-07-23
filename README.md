@@ -92,3 +92,8 @@ The vector SkyRoute 天途 logo is stored in `assets/skyroute_tiantu_vector.svg`
 ## Tactical map marker convention
 
 The flat operational map uses cloud-safe badge markers: `P` police, `F` fire, `H` HazMat, `A` EMS, `+` hospital, `B` evacuation bus, `E` environmental team, and `S` sensor. The map legend uses the same markers.
+
+
+## Current map icon system
+
+V19 uses compact embedded PNG pictograms with universal operational symbols and ASCII fallbacks for Streamlit Cloud compatibility.
