@@ -257,13 +257,13 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 
 
 /* Compact map-layer pill bar */
-[class*="st-key-layer_toolbar_"]{{border:1px solid rgba(0,229,255,.16);border-radius:10px;background:rgba(4,13,20,.78);padding:4px 6px;margin:5px 0 9px;box-shadow:0 8px 22px rgba(0,0,0,.14);}}
+[class*="st-key-layer_toolbar_"]{{width:100%;box-sizing:border-box;border:1px solid rgba(0,229,255,.14);border-radius:9px;background:rgba(4,13,20,.72);padding:3px 5px;margin:4px 0 7px;box-shadow:0 6px 16px rgba(0,0,0,.12);}}
 [class*="st-key-layer_toolbar_"] [data-testid="stHorizontalBlock"]{{gap:.34rem!important;align-items:center;}}
 [class*="st-key-layer_toolbar_"] [data-testid="column"]{{padding:0!important;}}
-.sr-layer-inline-label{{height:28px;display:flex;align-items:center;gap:6px;padding:0 5px;color:#BFD2DF;font:700 9px 'Poppins';white-space:nowrap;}}
+.sr-layer-inline-label{{height:26px;display:flex;align-items:center;gap:6px;padding:0 5px;color:#BFD2DF;font:700 9px 'Poppins';white-space:nowrap;}}
 .sr-layer-inline-label svg{{width:14px;height:14px;stroke:#00E5FF;filter:drop-shadow(0 0 5px rgba(0,229,255,.4));}}
 [class*="st-key-layer_toolbar_"] [data-testid="stButton"]{{margin:0!important;}}
-[class*="st-key-layer_toolbar_"] [data-testid="stButton"] button{{min-height:28px!important;height:28px!important;padding:0 9px!important;border-radius:7px!important;font:700 8.5px 'JetBrains Mono'!important;text-transform:lowercase!important;line-height:1!important;box-shadow:none!important;white-space:nowrap!important;}}
+[class*="st-key-layer_toolbar_"] [data-testid="stButton"] button{{min-height:26px!important;height:26px!important;padding:0 8px!important;border-radius:7px!important;font:700 8.5px 'JetBrains Mono'!important;text-transform:lowercase!important;line-height:1!important;box-shadow:none!important;white-space:nowrap!important;}}
 [class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-secondary"]{{background:transparent!important;border:1px solid rgba(148,163,184,.18)!important;color:#91A87A!important;}}
 [class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-secondary"]:hover{{border-color:rgba(0,229,255,.42)!important;color:#D6EAF2!important;background:rgba(0,229,255,.04)!important;}}
 [class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-primary"]{{background:rgba(0,229,255,.11)!important;border:1px solid rgba(0,229,255,.62)!important;color:#E9FCFF!important;box-shadow:inset 0 0 0 1px rgba(0,229,255,.04),0 0 10px rgba(0,229,255,.08)!important;}}
@@ -4351,10 +4351,11 @@ def page_central() -> None:
                 st.session_state.selected_alert_id = None
                 st.rerun()
 
-    render_map_layer_controls("city")
-
     map_col, alert_col = st.columns([1.62, 1])
     with map_col:
+        # Keep the compact layer toolbar aligned to the map canvas instead of
+        # stretching across the full application width.
+        render_map_layer_controls("city")
         layers: List[pdk.Layer] = []
         building_layer = illustrative_buildings_layer("city")
         if building_layer:
@@ -4481,10 +4482,11 @@ def page_incident_overview() -> None:
             unsafe_allow_html=True,
         )
     st.markdown('<div class="sr-h2">Incident understanding and operational picture</div>', unsafe_allow_html=True)
-    render_map_layer_controls("incident")
     map_col, info_col = st.columns([1.58, 1])
 
     with map_col:
+        # Match the layer controls to the map width for a cleaner visual hierarchy.
+        render_map_layer_controls("incident")
         layers: List[pdk.Layer] = []
         building_layer = illustrative_buildings_layer("incident")
         pop3d_layer = worldpop_3d_layer("incident")
