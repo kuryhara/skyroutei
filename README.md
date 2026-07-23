@@ -44,19 +44,20 @@ Presentation keeps the operational screens and their decision controls active.
 On the route-comparison step, **FASTEST** and **LOWEST EXPOSURE** remain
 simultaneously visible on the map, with distinct colors, direct labels and
 directional chevrons. Response-unit markers remain visible as the scenario
-advances.
+advances, and moving units display their identity, status and remaining ETA
+without requiring hover.
 
 The pitch metrics are explicitly identified as scenario estimates. The
 application does not claim predicted lives saved or perform real dispatch.
 
 ## Map context
 
-Use the compact **Layers** button to open or close the optional map context.
-When OSMnx and an internet connection are available, **land use** and
-**buildings** request OpenStreetMap context. The offline presentation fallback
-is identified as illustrative context. Building footprints are flat visual
-boundaries only; no height, occupancy or structural condition is inferred, and
-they do not affect the routing or risk models.
+The essential operational context remains visible without a separate Layers
+control. When OSMnx and an internet connection are available, land use and flat
+building footprints request OpenStreetMap context. The offline presentation
+fallback is identified as illustrative context. Building footprints are flat
+visual boundaries only; no height, occupancy or structural condition is
+inferred, and they do not affect the routing or risk models.
 
 The small map bar keeps north orientation on the upper-left and exposes source,
 interaction and modeling notes only through the `i` control.

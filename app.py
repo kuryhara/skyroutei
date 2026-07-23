@@ -1,5 +1,5 @@
 """
-SkyRoute / 天途 v26 — Guided Operations and Route Clarity
+SkyRoute / 天途 v27 — Clean Map Chrome and Visible Unit Status
 ==================================================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
@@ -129,12 +129,13 @@ section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] .stMark
 .sr-topstats {{display:flex;gap:24px;flex-wrap:wrap;}}
 .sr-topstat {{font:9.5px 'JetBrains Mono';color:{MUTED};text-transform:uppercase;}}
 .sr-topstat b {{display:block;color:{TEXT};font-size:11.5px;margin-top:4px;text-transform:none;}}
-.sr-top-right{{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:flex-end;}}
-.sr-top-actions{{display:flex;align-items:center;gap:7px;}}
+.sr-top-right{{display:flex;align-items:center;gap:18px;flex:1;min-width:0;justify-content:flex-end;}}
+.sr-top-actions{{display:flex;align-items:center;gap:7px;margin-left:auto;flex:0 0 auto;}}
 .sr-top-link{{height:34px;display:inline-flex;align-items:center;justify-content:center;padding:0 12px;border:1px solid rgba(213,242,109,.48);border-radius:8px;background:rgba(213,242,109,.055);color:#F2F6E8!important;text-decoration:none!important;font:700 9px 'JetBrains Mono';white-space:nowrap;transition:.16s ease;}}
 .sr-top-link:hover{{border-color:#D5F26D;background:rgba(213,242,109,.14);box-shadow:0 0 15px rgba(213,242,109,.12);transform:translateY(-1px);}}
 .sr-top-link.presentation{{background:#D5F26D;color:#06110E!important;border-color:#D5F26D;}}
 .sr-top-link.presentation:hover{{background:#E4FA8E;box-shadow:0 0 18px rgba(213,242,109,.28);}}
+@media(max-width:1180px){{.sr-top{{align-items:flex-start;}}.sr-top-right{{width:100%;flex-basis:100%;}}.sr-topstats{{gap:14px;}}.sr-top-actions{{margin-left:auto;}}}}
 .sr-card {{border:1px solid {LINE};border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,rgba(8,24,42,.98),rgba(4,13,25,.98));box-shadow:inset 0 1px rgba(255,255,255,.025);min-height:86px;}}
 .sr-card .k {{font:9px 'JetBrains Mono';color:{MUTED};text-transform:uppercase;letter-spacing:.06em;}}
 .sr-card .v {{font-family:'Poppins';font-size:19px;font-weight:700;margin-top:5px;}}
@@ -219,13 +220,16 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-h2{{color:#F2F6E8;}}
 .sr-top{{border-color:#768C45;background:linear-gradient(135deg,rgba(24,39,29,.97),rgba(6,17,14,.99));}}
 .sr-logo{{display:none;}}
-.sr-map-chrome{{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:34px;border:1px solid rgba(0,229,255,.17);border-bottom:none;border-radius:10px 10px 0 0;padding:4px 7px 4px 10px;background:rgba(4,13,20,.94);margin:5px 0 -1px;position:relative;z-index:4;}}
+.sr-map-chrome-left{{display:flex;align-items:center;gap:7px;min-height:26px;}}
 .sr-map-chrome-label{{font:700 8px 'JetBrains Mono';letter-spacing:.10em;text-transform:uppercase;color:#91A87A;}}
-.sr-map-chrome-controls{{display:flex;align-items:center;gap:6px;}}
 .sr-north-pill{{height:26px;min-width:44px;padding:0 8px;border:1px solid rgba(255,255,255,.28);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;gap:5px;background:rgba(5,15,28,.96);color:#F2F6E8;font:700 9px 'JetBrains Mono';}}
 .sr-north-arrow{{color:#D5F26D;font-size:14px;line-height:1;text-shadow:0 0 6px rgba(213,242,109,.45);}}
-[class*="st-key-map_info_"]{{margin-top:-39px;margin-left:auto;width:36px;position:relative;z-index:8;transform:translate(-7px,5px);}}
-[class*="st-key-map_info_"] [data-testid="stPopover"] button{{height:26px!important;width:28px!important;min-height:26px!important;padding:0!important;border-radius:50%!important;background:rgba(5,15,28,.98)!important;border:1px solid rgba(255,255,255,.42)!important;color:#fff!important;font:700 11px 'Poppins'!important;}}
+[class*="st-key-map_chrome_"]{{min-height:36px;border:1px solid rgba(0,229,255,.17);border-bottom:none;border-radius:10px 10px 0 0;padding:4px 7px 4px 10px;background:rgba(4,13,20,.94);margin:5px 0 -1px;position:relative;z-index:8;}}
+[class*="st-key-map_chrome_"] [data-testid="stHorizontalBlock"]{{align-items:center!important;gap:0!important;}}
+[class*="st-key-map_chrome_"] [data-testid="column"]{{padding:0!important;}}
+[class*="st-key-map_chrome_"] [data-testid="stPopover"]{{display:flex!important;justify-content:flex-end!important;align-items:center!important;}}
+[class*="st-key-map_chrome_"] [data-testid="stPopover"]>button{{height:26px!important;width:26px!important;min-height:26px!important;min-width:26px!important;padding:0!important;margin:0!important;border-radius:50%!important;background:rgba(5,15,28,.98)!important;border:1px solid rgba(255,255,255,.42)!important;color:#fff!important;font:700 11px 'Poppins'!important;line-height:1!important;box-shadow:none!important;}}
+[class*="st-key-map_chrome_"] [data-testid="stPopover"]>button svg{{display:none!important;}}
 .sr-map-legend{{border:1px solid #405334;border-radius:12px;padding:10px 12px;background:rgba(6,17,14,.94);margin:7px 0 12px;}}
 .sr-map-legend-title{{font-family:'Poppins';font-size:11px;font-weight:700;color:#D5F26D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}}
 .sr-map-legend-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px 12px;}}
@@ -260,12 +264,6 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 @media(max-width:1000px){{.sr-workflow{{position:relative;top:auto}}.sr-brand-lockup{{gap:10px}}.sr-brand-icon{{height:44px}}.sr-brand-wordmark{{font-size:30px;letter-spacing:.10em}}.sr-sidebar-brand .sr-brand-wordmark{{font-size:24px;}}}}
 
 
-/* Compact map-layer popover */
-[class*="st-key-layer_menu_"]{{width:max-content;max-width:130px;margin:4px 0 7px;position:relative;z-index:6;}}
-[class*="st-key-layer_menu_"] [data-testid="stPopover"]>button{{height:29px!important;min-height:29px!important;padding:0 10px!important;border:1px solid rgba(0,229,255,.38)!important;border-radius:8px!important;background:rgba(4,13,20,.86)!important;color:#D6EAF2!important;font:700 9px 'Poppins'!important;box-shadow:none!important;}}
-[class*="st-key-layer_menu_"] [data-testid="stPopover"]>button:hover{{border-color:#00E5FF!important;background:rgba(0,229,255,.08)!important;}}
-.sr-layer-menu-head{{font:700 9px 'JetBrains Mono';letter-spacing:.10em;text-transform:uppercase;color:#D5F26D;margin-bottom:6px;}}
-.sr-layer-menu-note{{font:8px/1.45 'JetBrains Mono';color:#91A87A;margin-bottom:8px;}}
 .sr-data-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin:7px 0 12px;}}
 .sr-data-card{{border:1px solid #405334;border-radius:11px;background:linear-gradient(180deg,rgba(8,24,42,.92),rgba(5,15,28,.95));padding:12px;min-height:112px;}}
 .sr-data-card .eyebrow{{font:8px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#91A87A;}}
@@ -3389,38 +3387,35 @@ def make_deck(
 
 
 def render_map_info(map_key: str) -> None:
-    """Render map controls as stable Streamlit chrome.
-
-    Earlier absolute-positioned controls could fall behind the PyDeck canvas on
-    Streamlit Cloud. This version keeps North and the source popover in the map
-    frame itself, so they remain visible at every screen size.
-    """
-    st.markdown(
-        '<div class="sr-map-chrome"><div class="sr-map-chrome-controls">'
-        '<span class="sr-north-pill" title="North"><span class="sr-north-arrow">↑</span>N</span>'
-        '<span class="sr-map-chrome-label">Operational map</span></div>'
-        '<div style="width:34px"></div></div>',
-        unsafe_allow_html=True,
-    )
-    with st.container(key=f"map_info_{map_key}"):
-        with st.popover("i", help="Map instructions and data sources"):
-            st.markdown("**Map interaction**")
-            st.caption(
-                "Hover for details. Left-drag to pan, right-drag to rotate and change pitch, "
-                "and scroll to zoom. On selectable maps, click a highlighted object to open it."
+    """Keep North and information perfectly aligned in one map header."""
+    with st.container(key=f"map_chrome_{map_key}"):
+        chrome_left, chrome_info = st.columns([12, 0.55], vertical_alignment="center")
+        with chrome_left:
+            st.markdown(
+                '<div class="sr-map-chrome-left">'
+                '<span class="sr-north-pill" title="North"><span class="sr-north-arrow">↑</span>N</span>'
+                '<span class="sr-map-chrome-label">Operational map</span></div>',
+                unsafe_allow_html=True,
             )
-            st.markdown("**Sources and limits**")
-            st.caption(
-                "Basemap, roads, land use and available flat building footprints: "
-                "OpenStreetMap contributors / ODbL, rendered with CARTO and PyDeck. "
-                "When the live OSM context query is unavailable, the land-use and footprint "
-                "layers use clearly identified local demonstration context."
-            )
-            st.caption(
-                "Routing uses the configured ORS, OSRM, OSMnx or AMap connector. "
-                "Population, traffic, weather and incident values are identified as public, "
-                "estimated or simulated in Data. Building outlines are visual only."
-            )
+        with chrome_info:
+            with st.popover("i", help="Map instructions and data sources"):
+                st.markdown("**Map interaction**")
+                st.caption(
+                    "Hover for additional details. Left-drag to pan, right-drag to rotate and "
+                    "change pitch, and scroll to zoom. On selectable maps, click a highlighted object."
+                )
+                st.markdown("**Sources and limits**")
+                st.caption(
+                    "Basemap, roads, land use and available flat building footprints: "
+                    "OpenStreetMap contributors / ODbL, rendered with CARTO and PyDeck. "
+                    "When the live OSM context query is unavailable, the land-use and footprint "
+                    "layers use clearly identified local demonstration context."
+                )
+                st.caption(
+                    "Routing uses the configured ORS, OSRM, OSMnx or AMap connector. "
+                    "Population, traffic, weather and incident values are identified as public, "
+                    "estimated or simulated in Data. Building outlines are visual only."
+                )
 
 
 def render_map(
@@ -4044,14 +4039,17 @@ routing_backend = "Automatic real streets"
 use_basemap = True
 ors_api_key = "" if ors_is_local() else get_ors_key()
 
-show_population_layer = bool(st.session_state.get("layer_population", True))
-show_landuse_layer = bool(st.session_state.get("layer_landuse", True))
-show_buildings_layer = bool(st.session_state.get("layer_buildings", True))
-show_resources_layer = bool(st.session_state.get("layer_resources", True))
-show_routes_layer = bool(st.session_state.get("layer_traffic_routes", True))
-show_traffic_layer = bool(st.session_state.get("layer_traffic_routes", True))
-show_water_layer = bool(st.session_state.get("layer_environment", True))
-show_environment_layer = bool(st.session_state.get("layer_environment", True))
+# Essential operational context stays visible. The public Layers switch was
+# removed because it competed with the incident workflow and confused the
+# hierarchy of the main navigation.
+show_population_layer = True
+show_landuse_layer = True
+show_buildings_layer = True
+show_resources_layer = True
+show_routes_layer = True
+show_traffic_layer = True
+show_water_layer = True
+show_environment_layer = True
 show_labels_layer = True
 show_3d_buildings = False
 show_worldpop_3d = False
@@ -4282,6 +4280,16 @@ def deployed_vehicle_data() -> List[Dict[str, Any]]:
             if progress >= 1 and status != "On scene":
                 st.session_state.dispatch_status[resource.id] = "On scene"
                 status = "On scene"
+        remaining_eta = max(0.0, float(route.eta_min) * (1.0 - progress))
+        if status == "On scene":
+            unit_label = f"{AGENCY_LABEL[kind].upper()} · {resource.id}\nON SCENE"
+        elif status == "En route":
+            unit_label = (
+                f"{AGENCY_LABEL[kind].upper()} · {resource.id}\n"
+                f"EN ROUTE · ETA {remaining_eta:.1f} MIN"
+            )
+        else:
+            unit_label = ""
         output.append({
             "id": resource.id,
             "kind": kind,
@@ -4290,13 +4298,51 @@ def deployed_vehicle_data() -> List[Dict[str, Any]]:
             "lat": position[1],
             "color": AGENCY_COLOR[kind] + [245],
             "glyph": AGENCY_GLYPH[kind],
+            "unit_label": unit_label,
+            "label_color": AGENCY_COLOR[kind] + [255],
+            "label_background": [1, 8, 12, 238],
+            "remaining_eta_min": round(remaining_eta, 1),
             "title": f"{AGENCY_LABEL[kind]} · {resource.name}",
             "details": (
                 f"Status: {status}<br/>Units selected: {quantity}<br/>"
-                f"Mission: {target['name']}<br/>Route progress: {progress:.0%}"
+                f"Mission: {target['name']}<br/>Route progress: {progress:.0%}<br/>"
+                f"Remaining ETA: {remaining_eta:.1f} min"
             ),
         })
     return output
+
+
+def moving_unit_label_layers(prefix: str, data: List[Dict[str, Any]]) -> List[pdk.Layer]:
+    """Keep unit identity, movement status and ETA visible without hover."""
+    labels = [
+        item for item in data
+        if item.get("status") in {"En route", "On scene"} and item.get("unit_label")
+    ]
+    if not labels:
+        return []
+    return [
+        pdk.Layer(
+            "TextLayer",
+            id=f"{prefix}-persistent-labels",
+            data=labels,
+            get_position="[lon, lat, 28]",
+            get_text="unit_label",
+            get_color="label_color",
+            get_background_color="label_background",
+            get_size=11,
+            size_units="pixels",
+            get_pixel_offset=[0, -38],
+            get_text_anchor="'middle'",
+            get_alignment_baseline="'bottom'",
+            background=True,
+            background_padding=[6, 4],
+            billboard=True,
+            font_family="Arial",
+            character_set="auto",
+            pickable=False,
+            parameters={"depthTest": False},
+        )
+    ]
 
 
 def route_layers_for_plan(alpha_other: int = 185) -> List[pdk.Layer]:
@@ -4717,53 +4763,6 @@ def render_selected_decision_strip() -> None:
             st.rerun()
 
 
-def render_map_layer_controls(scope: str) -> None:
-    """Keep optional map context behind one compact Layers popover."""
-    global show_population_layer, show_environment_layer, show_water_layer
-    global show_resources_layer, show_routes_layer, show_traffic_layer
-    global show_landuse_layer, show_buildings_layer, show_3d_buildings
-
-    layer_specs = [
-        ("population", "layer_population", "Vulnerable population targets and exposure buffers"),
-        ("environment", "layer_environment", "Water, protected areas and environmental receptors"),
-        ("land use", "layer_landuse", "OpenStreetMap land-use polygons"),
-        ("buildings", "layer_buildings", "Flat OpenStreetMap building footprints; no 3D height"),
-        ("resources", "layer_resources", "Police, fire, HazMat, EMS and support resources"),
-        ("routes", "layer_traffic_routes", "Traffic state, corridors and operational routes"),
-    ]
-
-    with st.container(key=f"layer_menu_{scope}"):
-        with st.popover("▱ Layers", help="Show or hide supporting map context"):
-            st.markdown(
-                '<div class="sr-layer-menu-head">Map layers</div>'
-                '<div class="sr-layer-menu-note">Optional context. Route and decision controls remain separate.</div>',
-                unsafe_allow_html=True,
-            )
-            layer_columns = st.columns(2, gap="small")
-            for index, (label, state_key, help_text) in enumerate(layer_specs):
-                is_active = bool(st.session_state.get(state_key, True))
-                with layer_columns[index % 2]:
-                    if st.button(
-                        f"✓ {label}" if is_active else label,
-                        key=f"{scope}_{state_key}_menu",
-                        type="primary" if is_active else "secondary",
-                        help=help_text,
-                        use_container_width=True,
-                    ):
-                        st.session_state[state_key] = not is_active
-                        st.rerun()
-
-    show_population_layer = bool(st.session_state.get("layer_population", True))
-    show_environment_layer = bool(st.session_state.get("layer_environment", True))
-    show_water_layer = show_environment_layer
-    show_landuse_layer = bool(st.session_state.get("layer_landuse", True))
-    show_buildings_layer = bool(st.session_state.get("layer_buildings", True))
-    show_resources_layer = bool(st.session_state.get("layer_resources", True))
-    show_routes_layer = bool(st.session_state.get("layer_traffic_routes", True))
-    show_traffic_layer = show_routes_layer
-    show_3d_buildings = False
-
-
 # =============================================================================
 # PAGE 1 — CENTRAL AND PREVENTION
 # =============================================================================
@@ -4817,9 +4816,6 @@ def page_central() -> None:
 
     map_col, alert_col = st.columns([1.62, 1])
     with map_col:
-        # Keep the compact layer toolbar aligned to the map canvas instead of
-        # stretching across the full application width.
-        render_map_layer_controls("city")
         layers: List[pdk.Layer] = []
         layers.extend(urban_context_layers("city"))
         if show_environment_layer:
@@ -4947,8 +4943,6 @@ def page_incident_overview() -> None:
     map_col, info_col = st.columns([1.58, 1])
 
     with map_col:
-        # Match the layer controls to the map width for a cleaner visual hierarchy.
-        render_map_layer_controls("incident")
         layers: List[pdk.Layer] = []
         pop3d_layer = worldpop_3d_layer("incident")
         layers.extend(urban_context_layers("incident"))
@@ -5348,6 +5342,7 @@ def page_dispatch() -> None:
             layers += resource_halo_layers("dispatch-moving-units", deployed)
             if show_labels_layer:
                 layers += point_layers("dispatch-moving-units", deployed, 78, 22)
+            layers += moving_unit_label_layers("dispatch-moving-units", deployed)
 
         center_lat = (selected_resource.lat + selected_target["lat"]) / 2
         center_lon = (selected_resource.lon + selected_target["lon"]) / 2
@@ -5642,6 +5637,8 @@ def consolidated_map_layers() -> List[pdk.Layer]:
             layers += point_layers("plan-bases", bases, 54, 19)
             if deployed:
                 layers += point_layers("plan-moving-resources", deployed, 76, 21)
+        if deployed:
+            layers += moving_unit_label_layers("plan-moving-resources", deployed)
 
     if show_labels_layer:
         if mission_targets:
@@ -6752,9 +6749,6 @@ def page_presentation() -> None:
     st.caption(
         "Guided presentation · the operational interface and its decision controls remain active below."
     )
-    if step_index > 0:
-        render_map_layer_controls(f"presentation-{step_index}")
-
     operational_views = [
         page_central,
         page_population,
@@ -6941,7 +6935,7 @@ PAGE_FUNCTIONS.get(page, page_central)()
 st.markdown(
     """
 <div class="sr-footer">
-SkyRoute / 天途 v26 · live vulnerability-aware emergency decision demonstrator.<br/>
+SkyRoute / 天途 v27 · live vulnerability-aware emergency decision demonstrator.<br/>
 Default positions, traffic, population estimates, plume geometry, hospital capacity and response scores are simulation inputs. The Huai'an 2005 scenario is presented as a live incident simulation based on a real event; operational map anchors and changing weather inputs remain modeling assumptions. No real dispatch is performed.<br/>
 Production deployment requires official emergency plans, validated vulnerability and dispersion models, licensed data, secure platform integration and final human command authority.
 </div>
