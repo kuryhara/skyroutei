@@ -425,11 +425,10 @@ MAP_SYMBOL_GLYPH = {
     "target": "T",
 }
 
-# Incident marker rendered with a self-contained SVG data URI. The TextLayer
-# fallback is always placed underneath the IconLayer: when the SVG texture
-# loads, the opaque red icon covers it; when a browser or deployment blocks
-# IconLayer textures, the warning glyph remains visible at the same location.
-ALERT_ICON_DATA_URI = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJBbGVydCAvIGluY2lkZW50IGljb24iPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjMwIiBmaWxsPSIjRTI1NDNEIiBzdHJva2U9IiMwQjEyMjAiIHN0cm9rZS13aWR0aD0iMy41Ii8+CiAgPHJlY3QgeD0iMjguNSIgeT0iMTQiIHdpZHRoPSI3IiBoZWlnaHQ9IjI2IiByeD0iMy41IiBmaWxsPSIjRkZGRkZGIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSI0NyIgcj0iNC42IiBmaWxsPSIjRkZGRkZGIi8+Cjwvc3ZnPgo="
+# Incident marker rendered with a self-contained raster data URI.
+# The visual is identical to the original SVG, but PNG provides intrinsic
+# dimensions and avoids createImageBitmap failures in Streamlit Cloud.
+ALERT_ICON_DATA_URI = "data:image/png;base64,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"
 ALERT_ICON_MAPPING = {
     "url": ALERT_ICON_DATA_URI,
     "width": 64,
@@ -2633,7 +2632,7 @@ def _prepare_point_data(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         item = dict(raw)
         symbol_key = _symbol_key_for_item(item)
         item["symbol_key"] = symbol_key
-        item["glyph"] = MAP_SYMBOL_GLYPH.get(symbol_key, "●")
+        item["glyph"] = str(MAP_SYMBOL_GLYPH.get(symbol_key, "O") or "O")[:2]
         item.setdefault("title", item.get("name", "Map object"))
         item.setdefault("details", item.get("description", "Operational map object"))
         item.setdefault("outline_color", STATUS_COLOR.get(str(item.get("status", "")), [5, 10, 16]) + [245])
@@ -2686,9 +2685,10 @@ def text_layer(
         size_max_pixels=size + 6,
         get_color=[3, 8, 14, 245] if shadow else "text_color",
         get_pixel_offset=[1, 1] if shadow else [0, 0],
-        get_alignment_baseline="center",
-        get_text_anchor="middle",
-        font_family="Arial, Helvetica, sans-serif",
+        get_alignment_baseline="'center'",
+        get_text_anchor="'middle'",
+        font_family="Arial",
+        character_set=list("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+!OX-"),
         billboard=True,
         pickable=False,
     )
@@ -2712,14 +2712,14 @@ def incident_icon_layers(
     """Render a custom incident icon with a client-side visual fallback.
 
     The fallback layer is deliberately inserted first. If the IconLayer image
-    texture loads, the opaque SVG covers the warning glyph. If it does not,
+    texture loads, the opaque PNG covers the ASCII fallback. If it does not,
     the TextLayer remains visible without changing incident data or tooltips.
     """
     incidents_with_icon: List[Dict[str, Any]] = []
     for raw in data:
         item = dict(raw)
         item["icon_data"] = dict(ALERT_ICON_MAPPING)
-        item["fallback_glyph"] = "⚠️"
+        item["fallback_glyph"] = "!"
         item.setdefault("title", item.get("name", "Incident"))
         item.setdefault("details", item.get("description", "Active incident"))
         incidents_with_icon.append(item)
@@ -2736,8 +2736,10 @@ def incident_icon_layers(
         size_max_pixels=24,
         get_color=[255, 255, 255, 255],
         get_pixel_offset=[0, -26],
-        get_alignment_baseline="center",
-        get_text_anchor="middle",
+        get_alignment_baseline="'center'",
+        get_text_anchor="'middle'",
+        font_family="Arial",
+        character_set=list("!"),
         billboard=True,
         pickable=False,
     )
