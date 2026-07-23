@@ -2811,13 +2811,21 @@ def incident_icon_layers(
     get_size: int = 4,
     size_scale: int = 13,
 ) -> List[pdk.Layer]:
-    """Render the incident badge upright and slightly above the map surface."""
+    """Render incident badges with restrained zoom-responsive sizing.
+
+    Meter-based sizing makes the symbol grow as the user zooms in and shrink as
+    the user zooms out. Pixel limits keep it readable at city scale and prevent
+    it from becoming oversized at street scale.
+    """
     incidents_with_icon: List[Dict[str, Any]] = []
     for raw in data:
         item = dict(raw)
         item["icon_data"] = dict(ALERT_ICON_MAPPING)
         item["icon_data"]["anchorY"] = 55
-        item["icon_size_px"] = 21
+        # Around 30–38 px at the incident-map zooms used by the interface.
+        # The rendered size then changes naturally with zoom between the limits
+        # configured on the IconLayer below.
+        item["icon_size_m"] = 980
         item["icon_elevation_m"] = 10
         item["fallback_glyph"] = "!"
         item.setdefault("title", item.get("name", "Incident"))
@@ -2830,10 +2838,10 @@ def incident_icon_layers(
         icon_mapping=None,
         get_icon="icon_data",
         get_position="[lon, lat, icon_elevation_m]",
-        get_size="icon_size_px",
-        size_units="pixels",
-        size_min_pixels=19,
-        size_max_pixels=23,
+        get_size="icon_size_m",
+        size_units="meters",
+        size_min_pixels=18,
+        size_max_pixels=46,
         get_pixel_offset=[0, -3],
         billboard=True,
         parameters={"depthTest": False},
