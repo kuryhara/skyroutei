@@ -1,5 +1,5 @@
 """
-SkyRoute / 天途 v12 — Live Vulnerability-Aware Emergency Decision Agent
+SkyRoute / 天途 v14 — Live Vulnerability-Aware Emergency Decision Agent
 ==================================================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
@@ -8,7 +8,7 @@ traffic control, environmental response and executive presentation.
 Run on Windows PowerShell
 -------------------------
 cd "C:\\Users\\leara\\Downloads"
-python -m streamlit run skyroute_cco_v4_live_case_brand_ops_v6.py
+python -m streamlit run app.py
 
 Required packages
 -----------------
@@ -78,7 +78,7 @@ except ImportError:  # pragma: no cover
 # PAGE AND VISUAL SYSTEM
 # =============================================================================
 st.set_page_config(
-    page_title="SkyRoute v13 | SkyTech CCO",
+    page_title="SkyRoute v14 | SkyTech CCO",
     page_icon="🛰️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -244,6 +244,13 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-hospital-card.limited{{border-color:#768C45;}}
 .sr-hospital-card.full{{border-color:#F26457;}}
 .sr-target-chip{{display:inline-flex;align-items:center;gap:6px;border:1px solid #405334;border-radius:999px;padding:4px 8px;font:9px 'JetBrains Mono';color:#D6E2C6;margin:3px 3px 0 0;}}
+.sr-global-nav{{border:1px solid rgba(148,163,184,.18);border-radius:13px;padding:8px 10px;background:linear-gradient(180deg,rgba(7,18,27,.88),rgba(4,11,17,.92));margin:0 0 12px;box-shadow:0 10px 28px rgba(0,0,0,.18);}}
+.sr-global-nav-label{{font:8px 'JetBrains Mono';color:#94A3B8;text-transform:uppercase;letter-spacing:.11em;margin-bottom:6px;}}
+.sr-map-view-bar{{border:1px solid rgba(0,217,255,.18);border-radius:11px;padding:7px 10px;background:rgba(3,13,20,.72);margin:5px 0 11px;}}
+.sr-map-view-bar .sr-small{{color:#A8BAC8;}}
+.sr-agent-return{{border:1px solid rgba(213,242,109,.28);border-radius:11px;padding:8px 10px;background:rgba(213,242,109,.045);margin-bottom:10px;}}
+.sr-map-legend-route{{display:inline-block;width:18px;height:4px;border-radius:999px;box-shadow:0 0 7px currentColor;}}
+.sr-map-legend-area{{display:inline-block;width:18px;height:13px;border-radius:3px;border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 0 0 2px rgba(0,0,0,.18);}}
 @media(max-width:1000px){{.sr-workflow{{position:relative;top:auto}}.sr-brand-lockup{{gap:10px}}.sr-brand-icon{{height:44px}}.sr-brand-wordmark{{font-size:30px;letter-spacing:.10em}}.sr-sidebar-brand .sr-brand-wordmark{{font-size:24px;}}}}
 
 </style>
@@ -331,41 +338,44 @@ class PreventiveAlert:
 # DEMONSTRATION DATA — NANJING JIANGBEI PILOT
 # =============================================================================
 THREAT_COLOR = {
-    "CRITICAL": [255, 59, 48],
-    "ELEVATED": [255, 159, 10],
-    "MODERATE": [255, 214, 10],
+    "CRITICAL": [255, 89, 94],
+    "ELEVATED": [255, 159, 28],
+    "MODERATE": [255, 209, 102],
 }
 STATUS_COLOR = {
-    "Available": [0, 255, 133],
-    "Requested": [255, 214, 10],
-    "En route": [0, 229, 255],
+    "Available": [0, 214, 143],
+    "Requested": [255, 209, 102],
+    "En route": [0, 196, 255],
     "On scene": [255, 255, 255],
-    "Busy": [255, 59, 48],
+    "Busy": [255, 89, 94],
+    "Returning": [148, 163, 184],
 }
-# Operational map colors intentionally prioritize contrast over brand identity.
+# Operational map colors prioritize perceptual separation on a dark basemap.
+# Agency identity is carried by both color and a geometric symbol, while status
+# is communicated by the outer halo. This avoids relying on color alone.
 AGENCY_COLOR = {
-    "police": [0, 229, 255],       # electric cyan
-    "fire": [255, 94, 31],         # rescue orange
-    "ambulance": [47, 128, 255],   # emergency blue
-    "hazmat": [255, 45, 149],      # hazard magenta
-    "environment": [0, 255, 133],  # monitoring green
-    "bus": [185, 107, 255],        # evacuation violet
-    "sensor": [255, 214, 10],      # sensor yellow
+    "police": [0, 196, 255],       # cyan
+    "fire": [255, 126, 34],        # orange
+    "ambulance": [76, 111, 255],   # blue-violet
+    "hazmat": [255, 45, 149],      # magenta
+    "environment": [0, 214, 143],  # green
+    "bus": [180, 106, 255],        # violet
+    "sensor": [255, 209, 102],     # amber
 }
 ROUTE_OBJECTIVE_COLOR = {
     "recommended": [255, 255, 255],
-    "fastest": [0, 229, 255],
-    "safest": [0, 255, 133],
-    "low_traffic": [255, 214, 10],
+    "fastest": [0, 217, 255],
+    "safest": [0, 230, 160],
+    "low_traffic": [255, 209, 102],
 }
 MAP_LINE_COLOR = {
     "road_closure": [255, 255, 255],
-    "emergency_corridor": [255, 214, 10],
-    "evacuation": [185, 107, 255],
-    "hazmat_restricted": [255, 59, 48],
+    "emergency_corridor": [255, 209, 102],
+    "evacuation": [180, 106, 255],
+    "hazmat_restricted": [255, 89, 94],
     "hazmat_bypass": [255, 45, 149],
-    "environmental_containment": [0, 255, 133],
-    "isolation": [255, 214, 10],
+    "environmental_containment": [0, 214, 143],
+    "isolation": [255, 209, 102],
     "water": [0, 168, 255],
 }
 AGENCY_LABEL = {
@@ -377,15 +387,39 @@ AGENCY_LABEL = {
     "bus": "Evacuation Bus",
     "sensor": "Mobile Sensor",
 }
+# Basic Unicode geometry is deliberately used instead of emoji. These symbols
+# render consistently in PyDeck TextLayer on local and Streamlit Cloud builds.
 AGENCY_GLYPH = {
-    "police": "🚓",
-    "fire": "🚒",
-    "ambulance": "🚑",
-    "hazmat": "☣",
-    "environment": "🌿",
-    "bus": "🚌",
-    "sensor": "📡",
+    "police": "■",
+    "fire": "▲",
+    "ambulance": "✚",
+    "hazmat": "◆",
+    "environment": "○",
+    "bus": "▬",
+    "sensor": "◉",
 }
+MAP_SYMBOL_GLYPH = {
+    "incident": "★",
+    "community": "●",
+    "school": "◆",
+    "hospital": "✚",
+    "shelter": "◇",
+    "police": "■",
+    "fire": "▲",
+    "ambulance": "✚",
+    "hazmat": "◆",
+    "environment": "○",
+    "bus": "▬",
+    "sensor": "◉",
+    "roadblock": "✖",
+    "drain": "▼",
+    "truck": "▰",
+    "traffic_incident": "×",
+    "water": "◒",
+    "protected": "▱",
+    "target": "◎",
+}
+
 
 INCIDENTS: List[Incident] = [
     Incident(
@@ -834,10 +868,10 @@ def point_risk(lat: float, lon: float, active: Incident, plume_polygon: List[Lis
 
 def traffic_color(congestion: float) -> List[int]:
     if congestion < 0.40:
-        return [0, 255, 133, 235]
+        return [0, 214, 143, 235]
     if congestion < 0.68:
-        return [255, 214, 10, 240]
-    return [255, 59, 48, 250]
+        return [255, 209, 102, 240]
+    return [255, 89, 94, 250]
 
 
 def status_text(congestion: float) -> str:
@@ -1477,24 +1511,24 @@ def load_public_protected_areas(center_lat: float = 32.160, center_lon: float = 
 def build_live_pois(hour: int, weekday: bool) -> List[Dict[str, Any]]:
     result = []
     colors = {
-        "school": [213, 242, 109],
-        "hospital": [82, 161, 190],
-        "residential": [82, 161, 190],
-        "village": [213, 242, 109],
-        "eldercare": [169, 191, 90],
-        "park": [169, 191, 90],
-        "fuel": [242, 100, 87],
-        "commercial": [118, 140, 69],
+        "school": [255, 209, 102],
+        "hospital": [0, 168, 255],
+        "residential": [255, 159, 28],
+        "village": [255, 159, 28],
+        "eldercare": [180, 106, 255],
+        "park": [0, 214, 143],
+        "fuel": [255, 89, 94],
+        "commercial": [148, 163, 184],
     }
     glyphs = {
-        "school": "🏫",
-        "hospital": "🏥",
-        "residential": "🏘",
-        "village": "🏘",
-        "eldercare": "👵",
-        "park": "🌳",
-        "fuel": "⛽",
-        "commercial": "🏬",
+        "school": MAP_SYMBOL_GLYPH["school"],
+        "hospital": MAP_SYMBOL_GLYPH["hospital"],
+        "residential": MAP_SYMBOL_GLYPH["community"],
+        "village": MAP_SYMBOL_GLYPH["community"],
+        "eldercare": MAP_SYMBOL_GLYPH["community"],
+        "park": MAP_SYMBOL_GLYPH["environment"],
+        "fuel": MAP_SYMBOL_GLYPH["hazmat"],
+        "commercial": MAP_SYMBOL_GLYPH["target"],
     }
     for poi in POIS:
         pop = current_population(poi, hour, weekday)
@@ -2407,13 +2441,6 @@ def choose_recommended_decision(options: List[DecisionOption], preferred_title: 
 # =============================================================================
 # SESSION STATE
 # =============================================================================
-NAVIGATION = [
-    "Central & Prevention",
-    "Incident Command",
-    "SkyRoute AI Copilot",
-    "Cases & Data",
-]
-
 INCIDENT_TABS = [
     "Overview",
     "Population",
@@ -2428,6 +2455,10 @@ INCIDENT_TABS = [
 def init_state() -> None:
     defaults: Dict[str, Any] = {
         "nav_page": "Central & Prevention",
+        "agent_return_page": "Central & Prevention",
+        "agent_return_incident_tab": "Overview",
+        "show_3d_buildings": True,
+        "show_worldpop_3d": True,
         "active_incident_id": INCIDENTS[0].id,
         "selected_alert_id": None,
         "incident_tab": "Overview",
@@ -2458,6 +2489,32 @@ def init_state() -> None:
 
 
 init_state()
+
+
+def navigate_to(page_name: str, incident_tab: Optional[str] = None) -> None:
+    """Navigate without the removed workspace radio and preserve incident context."""
+    st.session_state.nav_page = page_name
+    if incident_tab is not None:
+        st.session_state.incident_tab = incident_tab
+    st.rerun()
+
+
+def open_agent() -> None:
+    """Open the AI agent from any page and remember the exact return context."""
+    current_page = st.session_state.get("nav_page", "Central & Prevention")
+    if current_page != "SkyRoute AI Copilot":
+        st.session_state.agent_return_page = current_page
+        st.session_state.agent_return_incident_tab = st.session_state.get("incident_tab", "Overview")
+    st.session_state.nav_page = "SkyRoute AI Copilot"
+    st.rerun()
+
+
+def return_from_agent() -> None:
+    return_page = st.session_state.get("agent_return_page", "Central & Prevention")
+    st.session_state.nav_page = return_page
+    if return_page == "Incident Command":
+        st.session_state.incident_tab = st.session_state.get("agent_return_incident_tab", "Overview")
+    st.rerun()
 
 
 def active_incident() -> Incident:
@@ -2527,6 +2584,46 @@ def add_prevention_action(alert: PreventiveAlert) -> None:
 # =============================================================================
 # MAP LAYER HELPERS — ALL LAYERS HAVE IDs AND COMMON TOOLTIP FIELDS
 # =============================================================================
+def _symbol_key_for_item(item: Dict[str, Any]) -> str:
+    kind = str(item.get("kind", "")).lower()
+    if kind in AGENCY_GLYPH:
+        return kind
+    item_type = str(item.get("type", "")).lower()
+    if item_type in {"village", "residential", "population", "eldercare", "commercial"}:
+        return "community"
+    if item_type in MAP_SYMBOL_GLYPH:
+        return item_type
+    title = str(item.get("title", item.get("name", ""))).lower()
+    if "hospital" in title:
+        return "hospital"
+    if "school" in title:
+        return "school"
+    if "hazmat truck" in title or "vehicle" in title:
+        return "truck"
+    if "incident" in title or "leak" in title or "accident source" in title:
+        return "incident"
+    if "drain" in title:
+        return "drain"
+    if "sensor" in title:
+        return "sensor"
+    return "target"
+
+
+def _prepare_point_data(data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    prepared: List[Dict[str, Any]] = []
+    for raw in data:
+        item = dict(raw)
+        symbol_key = _symbol_key_for_item(item)
+        item["symbol_key"] = symbol_key
+        item["glyph"] = MAP_SYMBOL_GLYPH.get(symbol_key, "●")
+        item.setdefault("title", item.get("name", "Map object"))
+        item.setdefault("details", item.get("description", "Operational map object"))
+        item.setdefault("outline_color", STATUS_COLOR.get(str(item.get("status", "")), [5, 10, 16]) + [245])
+        item.setdefault("text_color", [255, 255, 255, 255])
+        prepared.append(item)
+    return prepared
+
+
 def scatter_layer(
     layer_id: str,
     data: List[Dict[str, Any]],
@@ -2535,40 +2632,48 @@ def scatter_layer(
     stroked: bool = True,
     pickable: bool = True,
 ) -> pdk.Layer:
+    prepared = _prepare_point_data(data)
     return pdk.Layer(
         "ScatterplotLayer",
         id=layer_id,
-        data=data,
+        data=prepared,
         get_position="[lon, lat]",
         get_radius=radius,
         get_fill_color=color,
         stroked=stroked,
-        get_line_color=[242, 246, 232, 220],
-        line_width_min_pixels=1.2,
+        get_line_color="outline_color",
+        line_width_min_pixels=2,
         pickable=pickable,
         auto_highlight=True,
+        highlight_color=[255, 255, 255, 105],
     )
 
 
-
 def text_layer(layer_id: str, data: List[Dict[str, Any]], size: int = 18) -> pdk.Layer:
+    prepared = _prepare_point_data(data)
     return pdk.Layer(
         "TextLayer",
         id=layer_id,
-        data=data,
+        data=prepared,
         get_position="[lon, lat]",
         get_text="glyph",
         get_size=size,
-        get_color=[242, 246, 232, 255],
+        get_color="text_color",
         get_alignment_baseline="center",
         get_text_anchor="middle",
-        font_family="Segoe UI Emoji, Noto Color Emoji, Arial Unicode MS, sans-serif",
+        font_family="Arial, Helvetica, sans-serif",
+        font_weight=700,
         pickable=False,
     )
 
 
 def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65, size: int = 18) -> List[pdk.Layer]:
-    return [scatter_layer(f"{layer_prefix}-points", data, radius), text_layer(f"{layer_prefix}-labels", data, size)]
+    prepared = _prepare_point_data(data)
+    return [
+        scatter_layer(f"{layer_prefix}-points", prepared, radius),
+        text_layer(f"{layer_prefix}-labels", prepared, size),
+    ]
+
 
 def path_layer(layer_id: str, data: List[Dict[str, Any]], width: int = 7, color: Any = "color", pickable: bool = True) -> pdk.Layer:
     return pdk.Layer(
@@ -2583,7 +2688,30 @@ def path_layer(layer_id: str, data: List[Dict[str, Any]], width: int = 7, color:
         cap_rounded=True,
         joint_rounded=True,
         auto_highlight=True,
+        highlight_color=[255, 255, 255, 120],
     )
+
+
+def path_layers_with_halo(
+    layer_id: str,
+    data: List[Dict[str, Any]],
+    width: int = 7,
+    halo_extra: int = 5,
+) -> List[pdk.Layer]:
+    """Render dark underlays beneath routes so overlapping colors remain legible."""
+    if not data:
+        return []
+    halo_data: List[Dict[str, Any]] = []
+    for raw in data:
+        item = dict(raw)
+        core_width = int(item.get("width", width))
+        item["color"] = [1, 5, 9, 235]
+        item["width"] = core_width + halo_extra
+        halo_data.append(item)
+    return [
+        path_layer(f"{layer_id}-halo", halo_data, width + halo_extra, pickable=False),
+        path_layer(layer_id, data, width, pickable=True),
+    ]
 
 
 def polygon_layer(layer_id: str, data: List[Dict[str, Any]], fill: Any, line: Any, pickable: bool = True) -> pdk.Layer:
@@ -2598,6 +2726,7 @@ def polygon_layer(layer_id: str, data: List[Dict[str, Any]], fill: Any, line: An
         line_width_min_pixels=2,
         pickable=pickable,
         auto_highlight=True,
+        highlight_color=[255, 255, 255, 70],
     )
 
 
@@ -2607,8 +2736,8 @@ def public_environment_layers(prefix: str) -> List[pdk.Layer]:
     return [polygon_layer(
         f"{prefix}-public-eco",
         PROTECTED_AREAS,
-        [0, 255, 133, 24],
-        [0, 255, 133, 215],
+        [0, 214, 143, 24],
+        [0, 214, 143, 215],
     )]
 
 
@@ -2716,9 +2845,13 @@ def render_map_legend(items: List[Tuple[str, str, str]], title: str = "Map legen
         return
     rendered = []
     for symbol, label, color in items:
-        rendered.append(
-            f'<div class="sr-map-legend-item"><span class="sr-legend-symbol" style="background:{color}">{symbol}</span><span>{label}</span></div>'
-        )
+        if symbol == "━":
+            swatch = f'<span class="sr-map-legend-route" style="background:{color};color:{color}"></span>'
+        elif symbol == "▰":
+            swatch = f'<span class="sr-map-legend-area" style="background:{color}"></span>'
+        else:
+            swatch = f'<span class="sr-legend-symbol" style="background:{color}">{symbol}</span>'
+        rendered.append(f'<div class="sr-map-legend-item">{swatch}<span>{label}</span></div>')
     st.markdown(
         f'<div class="sr-map-legend"><div class="sr-map-legend-title">{title}</div><div class="sr-map-legend-grid">{"".join(rendered)}</div></div>',
         unsafe_allow_html=True,
@@ -2767,11 +2900,11 @@ def vulnerability_buffer_data() -> List[Dict[str, Any]]:
     for item in ranking:
         ratio = item["priority_score"] / max_score
         if ratio >= 0.78:
-            fill, line, level = [242, 100, 87, 42], [242, 100, 87, 230], "Critical priority"
+            fill, line, level = [255, 89, 94, 42], [255, 89, 94, 230], "Critical priority"
         elif ratio >= 0.55:
-            fill, line, level = [213, 242, 109, 34], [213, 242, 109, 220], "High priority"
+            fill, line, level = [255, 209, 102, 34], [255, 209, 102, 220], "High priority"
         else:
-            fill, line, level = [82, 161, 190, 28], [82, 161, 190, 190], "Monitored priority"
+            fill, line, level = [0, 196, 255, 28], [0, 196, 255, 190], "Monitored priority"
         radius = int(clamp(
             160 + math.sqrt(max(1, item["population_now"])) * 16 + item["vulnerability"] * 55,
             180,
@@ -2788,7 +2921,8 @@ def vulnerability_buffer_data() -> List[Dict[str, Any]]:
                 f"Dynamic priority {item['priority_score']:.1f}<br/>"
                 f"Estimated people {item['population_now']:,}<br/>"
                 f"Distance {item['distance_m']} m<br/>"
-                f"Downwind alignment {item['downwind_alignment']:.0%}"
+                f"Downwind alignment {item['downwind_alignment']:.0%}<br/>"
+                f"Estimated plume arrival: {incident_state.get('plume_arrival_min', '—')} min"
             ),
         })
     return output
@@ -2825,11 +2959,12 @@ def hospital_map_data() -> List[Dict[str, Any]]:
             continue
         available = int(poi.get("available_beds", max(20, int(poi.get("base_pop", 100) * 0.1))))
         status = str(poi.get("hospital_status", "Available"))
-        color = [169, 191, 90, 245] if status == "Available" else [118, 140, 69, 245] if status == "Limited" else [242, 100, 87, 245]
+        outline = STATUS_COLOR.get("Available" if status == "Available" else "Requested" if status == "Limited" else "Busy", [148, 163, 184]) + [250]
         output.append({
             **poi,
-            "color": color,
-            "glyph": "🏥",
+            "color": [0, 168, 255, 245],
+            "outline_color": outline,
+            "glyph": MAP_SYMBOL_GLYPH["hospital"],
             "title": poi["name"],
             "details": (
                 f"Hospital status: {status}<br/>Available beds: {available}<br/>"
@@ -2847,7 +2982,7 @@ def resource_halo_layers(prefix: str, data: List[Dict[str, Any]]) -> List[pdk.La
         status = item.get("status", "Available")
         if status not in {"Requested", "En route", "On scene"}:
             continue
-        color = [213, 242, 109, 220] if status == "En route" else [169, 191, 90, 220] if status == "On scene" else [118, 140, 69, 220]
+        color = STATUS_COLOR.get(status, [148, 163, 184]) + [220]
         active_data.append({
             **item,
             "halo_radius": (125 if status == "On scene" else 105) * pulse,
@@ -2881,17 +3016,20 @@ def worldpop_3d_data() -> List[Dict[str, Any]]:
             continue
         pop = max(1, int(poi.get("population_now", 1)))
         priority = ranking.get(poi.get("id"), {}).get("priority_score", poi.get("vulnerability", 1) * 10)
-        color = [242, 100, 87, 190] if priority >= 90 else [213, 242, 109, 185] if priority >= 60 else [82, 161, 190, 175]
+        color = [255, 89, 94, 205] if priority >= 90 else [255, 209, 102, 195] if priority >= 60 else [0, 196, 255, 180]
         for idx, (dx, dy) in enumerate(offsets):
             share = pop / len(offsets) * (1.12 if idx == 0 else 0.98)
             columns.append({
                 "lon": poi["lon"] + dx,
                 "lat": poi["lat"] + dy,
-                "elevation": min(900, 45 + math.sqrt(share) * 28),
-                "radius": 42 if idx else 58,
+                "elevation": min(1150, 70 + math.sqrt(share) * 36),
+                "radius": 38 if idx else 54,
                 "color": color,
-                "title": f"{poi['name']} · WorldPop 2020 illustrative 3D",
-                "details": f"Illustrative population column<br/>Estimated local presence share: {share:.0f}",
+                "title": f"{poi['name']} · population volume",
+                "details": (
+                    f"Illustrative 3D population volume<br/>Estimated local presence share: {share:.0f}<br/>"
+                    f"Vulnerability index: {poi.get('vulnerability', 0)}<br/>Priority score: {priority:.1f}"
+                ),
             })
     return columns
 
@@ -2908,10 +3046,12 @@ def worldpop_3d_layer(prefix: str) -> Optional[pdk.Layer]:
         data=data,
         get_position="[lon, lat]",
         get_elevation="elevation",
-        elevation_scale=1,
+        elevation_scale=1.15,
         radius=48,
         get_fill_color="color",
-        disk_resolution=12,
+        disk_resolution=24,
+        coverage=0.88,
+        opacity=0.82,
         pickable=True,
         auto_highlight=True,
     )
@@ -2937,7 +3077,7 @@ def illustrative_building_data() -> List[Dict[str, Any]]:
             items.append({
                 "polygon": poly,
                 "height": base_h * (1 + (j % 2) * 0.35),
-                "color": [118, 140, 69, 125] if j else [169, 191, 90, 145],
+                "color": [102, 126, 148, 92] if j else [137, 159, 178, 112],
                 "title": "Illustrative 3D urban context",
                 "details": "Context massing for spatial orientation; not surveyed building height.",
             })
@@ -2958,9 +3098,11 @@ def illustrative_buildings_layer(prefix: str) -> Optional[pdk.Layer]:
         get_fill_color="color",
         get_elevation="height",
         extruded=True,
-        wireframe=False,
+        wireframe=True,
+        get_line_color=[183, 202, 216, 90],
+        line_width_min_pixels=1,
         pickable=True,
-        opacity=0.82,
+        opacity=0.62,
     )
 
 
@@ -2968,8 +3110,8 @@ def _nearest_traffic_roadblock_points() -> List[Dict[str, Any]]:
     candidate_segments = [seg for seg in traffic_segments if len(seg.get("path", [])) >= 4]
     if not candidate_segments:
         return [
-            {"id": "RB-A", "name": "North access roadblock", "lat": active.lat + 0.006, "lon": active.lon - 0.004, "type": "roadblock", "glyph": "⛔"},
-            {"id": "RB-B", "name": "South access roadblock", "lat": active.lat - 0.006, "lon": active.lon + 0.004, "type": "roadblock", "glyph": "⛔"},
+            {"id": "RB-A", "name": "North access roadblock", "lat": active.lat + 0.006, "lon": active.lon - 0.004, "type": "roadblock", "glyph": MAP_SYMBOL_GLYPH["roadblock"]},
+            {"id": "RB-B", "name": "South access roadblock", "lat": active.lat - 0.006, "lon": active.lon + 0.004, "type": "roadblock", "glyph": MAP_SYMBOL_GLYPH["roadblock"]},
         ]
     segment = min(candidate_segments, key=lambda seg: _distance_to_path_m(active.lat, active.lon, seg["path"]))
     path = segment["path"]
@@ -2978,8 +3120,8 @@ def _nearest_traffic_roadblock_points() -> List[Dict[str, Any]]:
     a = path[max(0, idx-step)]
     b = path[min(len(path)-1, idx+step)]
     return [
-        {"id": "RB-A", "name": f"{segment.get('name','Road')} · upstream roadblock", "lat": a[1], "lon": a[0], "type": "roadblock", "glyph": "⛔"},
-        {"id": "RB-B", "name": f"{segment.get('name','Road')} · downstream roadblock", "lat": b[1], "lon": b[0], "type": "roadblock", "glyph": "⛔"},
+        {"id": "RB-A", "name": f"{segment.get('name','Road')} · upstream roadblock", "lat": a[1], "lon": a[0], "type": "roadblock", "glyph": MAP_SYMBOL_GLYPH["roadblock"]},
+        {"id": "RB-B", "name": f"{segment.get('name','Road')} · downstream roadblock", "lat": b[1], "lon": b[0], "type": "roadblock", "glyph": MAP_SYMBOL_GLYPH["roadblock"]},
     ]
 
 
@@ -3000,7 +3142,7 @@ def mission_targets_for_kind(kind: str) -> List[Dict[str, Any]]:
         "lat": active.lat,
         "lon": active.lon,
         "type": "incident",
-        "glyph": "⚠",
+        "glyph": MAP_SYMBOL_GLYPH["incident"],
         "details": "Source control and technical containment",
     }
     roadblocks = _nearest_traffic_roadblock_points()
@@ -3010,7 +3152,7 @@ def mission_targets_for_kind(kind: str) -> List[Dict[str, Any]]:
         "lat": item["lat"],
         "lon": item["lon"],
         "type": "hospital",
-        "glyph": "🏥",
+        "glyph": MAP_SYMBOL_GLYPH["hospital"],
         "details": f"Receiving hospital · {item.get('available_beds', 0)} beds available",
     } for item in hospital_map_data()]
     shelters = [{
@@ -3019,20 +3161,20 @@ def mission_targets_for_kind(kind: str) -> List[Dict[str, Any]]:
         "lat": item["lat"],
         "lon": item["lon"],
         "type": "shelter",
-        "glyph": "⛺",
+        "glyph": MAP_SYMBOL_GLYPH["shelter"],
         "details": f"Evacuation shelter · capacity {item['capacity']:,}",
     } for item in SHELTERS]
     environmental = []
     if WATER_ZONES:
         lat, lon = _polygon_centroid(WATER_ZONES[0].get("polygon", []))
-        environmental.append({"id": "TARGET-WATER", "name": WATER_ZONES[0].get("name", "Water receptor"), "lat": lat, "lon": lon, "type": "environment", "glyph": "💧", "details": "Environmental protection mission"})
+        environmental.append({"id": "TARGET-WATER", "name": WATER_ZONES[0].get("name", "Water receptor"), "lat": lat, "lon": lon, "type": "environment", "glyph": MAP_SYMBOL_GLYPH["water"], "details": "Environmental protection mission"})
     if DRAINS:
-        environmental.append({"id": "TARGET-DRAIN", "name": DRAINS[0]["name"], "lat": DRAINS[0]["lat"], "lon": DRAINS[0]["lon"], "type": "environment", "glyph": "🌿", "details": "Drain and runoff protection"})
+        environmental.append({"id": "TARGET-DRAIN", "name": DRAINS[0]["name"], "lat": DRAINS[0]["lat"], "lon": DRAINS[0]["lon"], "type": "environment", "glyph": MAP_SYMBOL_GLYPH["environment"], "details": "Drain and runoff protection"})
     plume = incident_state.get("plume_polygon", [])
     if len(plume) >= 3:
         edge_lon = float(np.mean([plume[1][0], plume[2][0]]))
         edge_lat = float(np.mean([plume[1][1], plume[2][1]]))
-        environmental.append({"id": "TARGET-PLUME-EDGE", "name": "Downwind plume-edge monitoring point", "lat": edge_lat, "lon": edge_lon, "type": "sensor", "glyph": "📡", "details": "Mobile sensor deployment point"})
+        environmental.append({"id": "TARGET-PLUME-EDGE", "name": "Downwind plume-edge monitoring point", "lat": edge_lat, "lon": edge_lon, "type": "sensor", "glyph": MAP_SYMBOL_GLYPH["sensor"], "details": "Mobile sensor deployment point"})
 
     if kind in {"fire", "hazmat"}:
         return [incident_target] + roadblocks
@@ -3052,7 +3194,7 @@ def mission_targets_for_kind(kind: str) -> List[Dict[str, Any]]:
 def selected_mission_target(kind: str) -> Dict[str, Any]:
     targets = mission_targets_for_kind(kind)
     if not targets:
-        return {"id": "TARGET-INCIDENT", "name": "Incident source", "lat": active.lat, "lon": active.lon, "glyph": "⚠", "details": "Incident source"}
+        return {"id": "TARGET-INCIDENT", "name": "Incident source", "lat": active.lat, "lon": active.lon, "glyph": MAP_SYMBOL_GLYPH["incident"], "details": "Incident source"}
     selected_id = st.session_state.get("selected_mission_target_ids", {}).get(kind)
     selected = next((item for item in targets if item["id"] == selected_id), None)
     if selected is None:
@@ -3240,23 +3382,9 @@ def render_agent_workflow_tracker() -> None:
 active = active_incident()
 now = datetime.now()
 
-# Compact page navigation. Incidents are selected only through the visible
-# incident cards/buttons, avoiding a duplicate combobox in the header.
-def sync_navigation_from_widget() -> None:
-    st.session_state.nav_page = st.session_state.nav_widget
-
-if st.session_state.get("nav_widget") != st.session_state.nav_page:
-    st.session_state.nav_widget = st.session_state.nav_page
-
-st.radio(
-    "Operational workspace",
-    NAVIGATION,
-    key="nav_widget",
-    on_change=sync_navigation_from_widget,
-    horizontal=True,
-    label_visibility="collapsed",
-)
-page = st.session_state.nav_page
+# The former “Operational workspace” radio was removed from rendering and
+# state synchronization. Navigation now uses explicit buttons and session state.
+page = st.session_state.get("nav_page", "Central & Prevention")
 active = active_incident()
 
 _context = incident_context_bundle(active)
@@ -3290,8 +3418,8 @@ show_traffic_layer = True
 show_water_layer = True
 show_environment_layer = True
 show_labels_layer = True
-show_3d_buildings = False
-show_worldpop_3d = False
+show_3d_buildings = bool(st.session_state.get("show_3d_buildings", True))
+show_worldpop_3d = bool(st.session_state.get("show_worldpop_3d", True))
 
 # Stable scenario inputs used by the prevention and live-incident models.
 wind_speed_kmh = 16
@@ -3389,6 +3517,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown('<div class="sr-global-nav"><div class="sr-global-nav-label">Primary navigation</div></div>', unsafe_allow_html=True)
+nav_city, nav_incident, nav_cases, nav_ai = st.columns([1.05, 1.18, 1.0, 1.32])
+with nav_city:
+    if st.button("City command", key="global-nav-city", use_container_width=True, disabled=page == "Central & Prevention"):
+        navigate_to("Central & Prevention")
+with nav_incident:
+    if st.button("Incident command", key="global-nav-incident", use_container_width=True, disabled=page == "Incident Command"):
+        navigate_to("Incident Command", st.session_state.get("incident_tab", "Overview"))
+with nav_cases:
+    if st.button("Cases & data", key="global-nav-cases", use_container_width=True, disabled=page == "Cases & Data"):
+        navigate_to("Cases & Data")
+with nav_ai:
+    if st.button("✦ Ask SkyRoute AI", key="global-nav-agent", type="primary", use_container_width=True, disabled=page == "SkyRoute AI Copilot"):
+        open_agent()
+
 metric_items = [
     ("Threat", active.threat, f"{active.substance} · {active.quantity_t:.0f} t", RED),
     ("Protective zone", f"{incident_state['protective_distance']/1000:.1f} km", f"isolation {incident_state['isolation_distance']} m", AMBER),
@@ -3413,7 +3556,7 @@ def incident_map_data() -> List[Dict[str, Any]]:
         {
             **asdict(inc),
             "color": THREAT_COLOR[inc.threat] + [235],
-            "glyph": "!",
+            "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": f"{inc.id} · {inc.substance}",
             "details": f"{inc.threat}<br/>{inc.road}<br/>{inc.description}",
         }
@@ -3429,7 +3572,8 @@ def resource_map_data() -> List[Dict[str, Any]]:
         output.append({
             **asdict(resource),
             "status": status,
-            "color": STATUS_COLOR.get(status, [213, 242, 109]) + [230],
+            "color": AGENCY_COLOR.get(resource.kind, [255, 255, 255]) + [235],
+            "outline_color": STATUS_COLOR.get(status, [148, 163, 184]) + [250],
             "glyph": AGENCY_GLYPH.get(resource.kind, "●"),
             "title": resource.name,
             "details": (
@@ -3525,16 +3669,24 @@ def route_layers_for_plan(alpha_other: int = 185) -> List[pdk.Layer]:
             continue
         route = selected_route_for_kind(kind)
         target = selected_mission_target(kind)
+        resource_id = st.session_state.selected_resource_ids.get(kind)
+        resource = next((item for item in RESOURCES if item.id == resource_id), None)
         if route is None or len(route.path) < 2:
             continue
+        status = st.session_state.dispatch_status.get(resource.id, resource.status) if resource else "Planned"
         paths.append({
             "path": route.path,
             "color": AGENCY_COLOR[kind] + [min(245, alpha_other + 35)],
             "width": 8,
             "title": f"{AGENCY_LABEL[kind]} → {target['name']}",
-            "details": f"Mission route<br/>ETA {route.eta_min} min · {route.distance_km} km<br/>Backend: {route.backend}",
+            "details": (
+                f"Origin: {resource.name if resource else 'Selected agency base'}<br/>"
+                f"Destination: {target['name']}<br/>Mission: {AGENCY_LABEL[kind]} deployment<br/>"
+                f"Status: {status}<br/>ETA {route.eta_min} min · {route.distance_km} km<br/>"
+                f"Backend: {route.backend}"
+            ),
         })
-    return [path_layer("plan-resource-routes", paths, 8)] if paths else []
+    return path_layers_with_halo("plan-resource-routes", paths, 8, halo_extra=5) if paths else []
 
 def transparent_plot_layout(fig: go.Figure, height: int = 270) -> go.Figure:
     fig.update_layout(
@@ -3610,7 +3762,7 @@ def render_prevention_factor_chart() -> None:
 
 
 def render_route_comparison(options: Dict[str, RouteResult], selected_key: str) -> None:
-    routes = [(key, route) for key, route in options.items() if key != "recommended"]
+    routes = list(options.items())
     categories = ["ETA", "Exposure", "Environment", "Congestion", "Responder safety"]
     fig = go.Figure()
     maxima = [
@@ -3891,7 +4043,7 @@ def decision_overlay_layers(prefix: str, extra_options: Optional[List[DecisionOp
                 {"lat": 32.1555, "lon": 118.7165, "name": "Retention inlet water sensor"},
             ]
             layers += point_layers(f"{layer_key}-sensors", [{
-                **point, "color": [213, 242, 109, strength], "glyph": "S",
+                **point, "type": "sensor", "color": [255, 209, 102, strength], "glyph": MAP_SYMBOL_GLYPH["sensor"],
                 "title": f"{label} · {point['name']}", "details": record.get("title", option_id),
             } for point in proposals], 76 if chosen else 62, 13)
         elif option_id == "ENV-BOOM":
@@ -3996,14 +4148,14 @@ def page_central() -> None:
             drift = math.sin((st.session_state.demo_tick + idx) / 3) * 0.0012
             truck_data.append({
                 **truck, "lon": truck["lon"] + drift, "lat": truck["lat"] + drift * 0.4,
-                "color": [255, 45, 149, 240], "glyph": "T",
+                "type": "truck", "color": [255, 45, 149, 240], "glyph": MAP_SYMBOL_GLYPH["truck"],
                 "title": f"HazMat truck {truck['id']}",
                 "details": f"Cargo: {truck['substance']}<br/>Speed: {truck['speed']} km/h<br/>Corridor: {truck['route']}",
             })
         layers += point_layers("hazmat-trucks", truck_data, 75, 12)
         layers += point_layers("ordinary-accidents", [{
-            **acc, "color": [118, 140, 69, 230] if acc["severity"] == "minor" else [242, 100, 87, 235],
-            "glyph": "X", "title": acc["title"], "details": f"{acc['road']}<br/>Severity: {acc['severity']}",
+            **acc, "type": "traffic_incident", "color": [255, 209, 102, 230] if acc["severity"] == "minor" else [255, 89, 94, 235],
+            "glyph": MAP_SYMBOL_GLYPH["traffic_incident"], "title": acc["title"], "details": f"{acc['road']}<br/>Severity: {acc['severity']}",
         } for acc in ORDINARY_ACCIDENTS], 60, 11)
         layers += point_layers("incidents", incident_map_data(), 145, 16)
 
@@ -4011,7 +4163,7 @@ def page_central() -> None:
         if selected_alert:
             proposed_path = preventive_alternative_path(selected_alert)
             layers.append(path_layer("selected-preventive-risk", [{
-                "path": selected_alert.path, "color": [242, 100, 87, 235], "width": 17,
+                "path": selected_alert.path, "color": [255, 89, 94, 235], "width": 17,
                 "title": f"Current risk · {selected_alert.title}", "details": selected_alert.reason,
             }], 17))
             layers.append(path_layer("selected-preventive-highlight", [{
@@ -4020,7 +4172,7 @@ def page_central() -> None:
             }], 7))
             if proposed_path:
                 layers.append(path_layer("selected-preventive-alternative", [{
-                    "path": proposed_path, "color": [0, 229, 255, 250], "width": 12,
+                    "path": proposed_path, "color": [0, 217, 255, 250], "width": 12,
                     "title": "AI proposed preventive route", "details": f"Expected risk reduction: {selected_alert.risk_reduction}%",
                 }], 12))
             center_lat, center_lon, map_zoom = path_view(selected_alert.path + proposed_path)
@@ -4037,17 +4189,17 @@ def page_central() -> None:
                 log_event(f"Incident opened from city map: {chosen_id}", "incident")
                 st.rerun()
         city_legend: List[Tuple[str, str, str]] = [
-            ("⚠", "Hazardous-material incident", "#F26457"),
-            ("T", "HazMat vehicle", "#FF2D95"),
-            ("X", "Ordinary road incident", "#FF3B30"),
-            ("", "Traffic: free / slow / congested", "#FFD60A"),
-            ("", "HazMat corridor: low / medium / high risk", "#FF9F0A"),
-            ("🌿", "Environmental / protected receptor", "#00FF85"),
+            (MAP_SYMBOL_GLYPH["incident"], "Hazardous-material incident", "#FF595E"),
+            (MAP_SYMBOL_GLYPH["truck"], "HazMat vehicle", "#FF2D95"),
+            (MAP_SYMBOL_GLYPH["traffic_incident"], "Ordinary road incident", "#FF595E"),
+            ("━", "Traffic: free / slow / congested", "#FFD166"),
+            ("━", "HazMat corridor: low / medium / high risk", "#FF9F1C"),
+            ("▰", "Environmental / protected receptor", "#00D68F"),
         ]
         if selected_alert:
             city_legend += [
-                ("", "Selected high-risk road segment", "#FF3B30"),
-                ("", "AI preventive alternative", "#00E5FF"),
+                ("━", "Selected high-risk road segment", "#FF595E"),
+                ("━", "AI preventive alternative", "#00D9FF"),
             ]
         render_map_legend(city_legend, "Citywide operational map legend")
         st.caption("Click an incident marker to open its command workspace. Preventive previews visibly highlight the affected segment and the AI alternative.")
@@ -4108,7 +4260,7 @@ def page_incident_overview() -> None:
             layers.extend(public_environment_layers("incident"))
         if show_water_layer:
             water_data = [{**zone, "title": zone["name"], "details": "Sensitive water or ecological receptor"} for zone in WATER_ZONES]
-            layers.append(polygon_layer("incident-water", water_data, [82, 161, 190, 58], [82, 161, 190, 205]))
+            layers.append(polygon_layer("incident-water", water_data, [0, 168, 255, 58], [0, 168, 255, 215]))
         if show_traffic_layer:
             layers.append(path_layer("incident-traffic", traffic_path_data(), 8))
 
@@ -4117,7 +4269,7 @@ def page_incident_overview() -> None:
             "title": "Downwind protective-action zone",
             "details": f"Length {incident_state['protective_distance']/1000:.1f} km<br/>Wind {wind_label(wind_direction)} {wind_speed_kmh} km/h",
         }]
-        layers.append(polygon_layer("incident-plume", plume_data, [242, 100, 87, 68], [242, 100, 87, 235]))
+        layers.append(polygon_layer("incident-plume", plume_data, [255, 89, 94, 68], [255, 89, 94, 235]))
         isolation_data = [{
             "polygon": make_circle_polygon(active.lat, active.lon, incident_state["isolation_distance"]),
             "title": "Initial isolation zone",
@@ -4144,7 +4296,7 @@ def page_incident_overview() -> None:
             "lon": active.lon,
             "lat": active.lat,
             "color": THREAT_COLOR[active.threat] + [250],
-            "glyph": "⚠",
+            "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": f"{active.id} · {active.substance}",
             "details": f"Leak estimate: {incident_state['dynamic_leak']:.0f} kg/min<br/>{active.description}",
         }], 100, 22)
@@ -4153,20 +4305,28 @@ def page_incident_overview() -> None:
         deck = make_deck(layers, active.lat, active.lon, 13.05, pitch, -12, use_basemap)
         render_map(deck, "incident-overview-map", 650)
         legend = [
-            ("⚠", "Accident source", "#F26457"),
-            ("", "Toxic plume", "#F26457"),
-            ("", "Isolation zone", "#FFD60A"),
+            (MAP_SYMBOL_GLYPH["incident"], "Accident source", "#FF595E"),
+            ("▰", "Toxic plume", "#FF595E"),
+            ("▰", "Isolation zone", "#FFD166"),
         ]
         if show_population_layer:
-            legend += [("🏘", "Vulnerable community", "#D5F26D"), ("🏥", "Available hospital", "#00A8FF")]
+            legend += [(MAP_SYMBOL_GLYPH["community"], "Community / village", "#FF9F1C")]
+            present_types = {str(item.get("type", "")) for item in pois_live}
+            if "school" in present_types:
+                legend.append((MAP_SYMBOL_GLYPH["school"], "School", "#FFD166"))
+            if "eldercare" in present_types:
+                legend.append((MAP_SYMBOL_GLYPH["community"], "Elder-care facility", "#B46AFF"))
+            legend.append((MAP_SYMBOL_GLYPH["hospital"], "Available hospital", "#00A8FF"))
         if show_resources_layer:
-            legend += [("🚒", "Fire base", "#FF5E1F"), ("☣", "HazMat base", "#FF2D95"), ("🚓", "Police base", "#00E5FF"), ("🚑", "EMS base", "#2F80FF")]
+            legend += [(MAP_SYMBOL_GLYPH["fire"], "Fire base", "#FF7E22"), (MAP_SYMBOL_GLYPH["hazmat"], "HazMat base", "#FF2D95"), (MAP_SYMBOL_GLYPH["police"], "Police base", "#00C4FF"), (MAP_SYMBOL_GLYPH["ambulance"], "EMS base", "#4C6FFF")]
         if show_water_layer:
-            legend.append(("💧", "Water receptor", "#00A8FF"))
+            legend.append(("▰", "Water receptor", "#00A8FF"))
         if show_environment_layer:
-            legend.append(("🌿", "Protected / environmental area", "#00FF85"))
+            legend.append(("▰", "Protected / environmental area", "#00D68F"))
+        if show_3d_buildings:
+            legend.append(("▥", "Illustrative building massing 3D", "#899FB2"))
         if show_worldpop_3d:
-            legend.append(("▥", "WorldPop 2020 · illustrative 3D", "#D5F26D"))
+            legend.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
         render_map_legend(legend, "Operational map legend")
 
     with info_col:
@@ -4286,30 +4446,36 @@ def page_population() -> None:
             "polygon": incident_state["plume_polygon"],
             "title": "Protective-action plume",
             "details": f"Arrival estimate {incident_state['plume_arrival_min']} min",
-        }], [242, 100, 87, 60], [242, 100, 87, 225]))
+        }], [255, 89, 94, 60], [255, 89, 94, 225]))
         layers += vulnerability_buffer_layers("population")
         if show_labels_layer:
             layers += point_layers("pop-exposed-pois", incident_state["exposed_pois"], 74, 20)
             layers += point_layers("pop-shelters", [{
-                **shelter, "color": [169, 191, 90, 235], "glyph": "⛺", "title": shelter["name"],
+                **shelter, "color": [169, 191, 90, 235], "glyph": MAP_SYMBOL_GLYPH["shelter"], "title": shelter["name"],
                 "details": f"Shelter capacity: {shelter['capacity']:,}",
             } for shelter in SHELTERS], 72, 21)
             layers += point_layers("pop-hospitals", hospital_map_data(), 76, 22)
         layers += decision_overlay_layers("population-map", [preview])
         layers += point_layers("population-incident", [{
-            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": "⚠",
+            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
         }], 92, 22)
         pitch = 52 if (show_3d_buildings or show_worldpop_3d) else 34
         render_map(make_deck(layers, active.lat, active.lon, 12.45, pitch, -8, use_basemap), "population-protection-map", 680)
-        render_map_legend([
-            ("⚠", "Accident source", "#F26457"),
-            ("🏘", "Priority community / village", "#D5F26D"),
-            ("🏫", "School", "#D5F26D"),
-            ("🏥", "Receiving hospital", "#00A8FF"),
-            ("⛺", "Evacuation shelter", "#A9BF5A"),
-            ("", "Priority buffer size = population + vulnerability", "#768C45"),
-        ], "Population protection legend")
+        population_legend: List[Tuple[str, str, str]] = [
+            (MAP_SYMBOL_GLYPH["incident"], "Accident source", "#FF595E"),
+            (MAP_SYMBOL_GLYPH["community"], "Priority community / village", "#FF9F1C"),
+            (MAP_SYMBOL_GLYPH["school"], "School", "#FFD166"),
+            (MAP_SYMBOL_GLYPH["community"], "Elder-care facility", "#B46AFF"),
+            (MAP_SYMBOL_GLYPH["hospital"], "Receiving hospital", "#00A8FF"),
+            (MAP_SYMBOL_GLYPH["shelter"], "Evacuation shelter", "#00D68F"),
+            ("▰", "Priority buffer: red / amber / cyan", "#FFD166"),
+        ]
+        if show_3d_buildings:
+            population_legend.append(("▥", "Illustrative building massing 3D", "#899FB2"))
+        if show_worldpop_3d:
+            population_legend.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
+        render_map_legend(population_legend, "Population protection legend")
         st.info(f"Preview: **{preview.title}**. Buffer size reflects population and vulnerability; color reflects dynamic operational priority.")
 
     with decision_col:
@@ -4407,13 +4573,23 @@ def page_dispatch() -> None:
                 if len(route.path) < 2:
                     continue
                 selected = key == selected_route_key
+                recommended = key == "recommended"
                 route_rgb = ROUTE_OBJECTIVE_COLOR.get(key, AGENCY_COLOR[agency])
+                opacity = 255 if recommended else 235 if selected else 105
+                width = 13 if recommended else 9 if selected else 4
                 all_routes.append({
                     "path": route.path,
-                    "color": route_rgb + ([250] if selected else [115]),
-                    "width": 12 if selected else 5,
+                    "color": route_rgb + [opacity],
+                    "width": width,
                     "title": f"{route.label} · {selected_resource.name} → {selected_target['name']}",
-                    "details": f"ETA {route.eta_min} min · {route.distance_km} km<br/>{route.backend}",
+                    "details": (
+                        f"Objective: {'AI recommended' if recommended else key.replace('_', ' ').title()}<br/>"
+                        f"Mission: {AGENCY_LABEL[agency]} deployment<br/>"
+                        f"Status: {st.session_state.dispatch_status.get(selected_resource.id, selected_resource.status)}<br/>"
+                        f"ETA {route.eta_min} min · {route.distance_km} km<br/>"
+                        f"Exposure {route.exposure_score} · Environment {route.environment_score} · Congestion {route.congestion_score}<br/>"
+                        f"Backend: {route.backend}"
+                    ),
                 })
 
         layers: List[pdk.Layer] = []
@@ -4425,7 +4601,7 @@ def page_dispatch() -> None:
         if show_traffic_layer:
             layers.append(path_layer("dispatch-traffic", traffic_path_data(), 7))
         if all_routes:
-            layers.append(path_layer("dispatch-route-options", all_routes, 6))
+            layers += path_layers_with_halo("dispatch-route-options", all_routes, 6, halo_extra=5)
 
         resources_data = resource_map_data()
         if show_resources_layer:
@@ -4445,7 +4621,7 @@ def page_dispatch() -> None:
             layers += point_layers("dispatch-hospitals", hospital_map_data(), 76, 22)
 
         layers += point_layers("dispatch-incident", [{
-            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": "⚠",
+            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
         }], 96, 22)
 
@@ -4457,16 +4633,20 @@ def page_dispatch() -> None:
 
         center_lat = (selected_resource.lat + selected_target["lat"]) / 2
         center_lon = (selected_resource.lon + selected_target["lon"]) / 2
-        render_map(make_deck(layers, center_lat, center_lon, 12.35, 42, -8, use_basemap), "dispatch-resources-map", 690)
+        dispatch_pitch = 52 if show_3d_buildings else 38
+        render_map(make_deck(layers, center_lat, center_lon, 12.35, dispatch_pitch, -8, use_basemap), "dispatch-resources-map", 690)
         render_map_legend([
             (AGENCY_GLYPH[agency], f"{AGENCY_LABEL[agency]} origin / active unit", "#%02X%02X%02X" % tuple(AGENCY_COLOR[agency])),
-            (selected_target.get("glyph","◎"), "Assigned mission destination", "#FFFFFF"),
-            ("", "AI recommended route", "#FFFFFF"),
-            ("", "Fastest route", "#00E5FF"),
-            ("", "Lowest-exposure route", "#00FF85"),
-            ("", "Lowest-congestion route", "#FFD60A"),
-            ("🏥", "Available receiving hospital", "#00A8FF"),
-            ("◯", "Pulsing halo = requested / en route / on scene", "#FFFFFF"),
+            (MAP_SYMBOL_GLYPH.get(_symbol_key_for_item(selected_target), "◎"), "Assigned mission destination", "#FFFFFF"),
+            ("━", "AI recommended route", "#FFFFFF"),
+            ("━", "Fastest route", "#00D9FF"),
+            ("━", "Lowest-exposure route", "#00E6A0"),
+            ("━", "Lowest-congestion route", "#FFD166"),
+            (MAP_SYMBOL_GLYPH["hospital"], "Available receiving hospital", "#00A8FF"),
+            ("◉", "Requested halo", "#FFD166"),
+            ("◉", "En-route halo", "#00C4FF"),
+            ("◉", "On-scene halo", "#FFFFFF"),
+            *(([("▥", "Illustrative building massing 3D", "#899FB2")] if show_3d_buildings else [])),
         ], "Dispatch legend")
 
     st.markdown('<div class="sr-h2">Receiving hospital availability</div>', unsafe_allow_html=True)
@@ -4508,27 +4688,27 @@ def page_traffic() -> None:
         layers: List[pdk.Layer] = [path_layer("traffic-live-segments", traffic_path_data(), 10)]
         layers += decision_overlay_layers("traffic-map", [preview])
         layers += point_layers("traffic-hazmat-trucks", [{
-            **truck, "color": [118, 140, 69, 235], "glyph": "T", "title": f"HazMat truck {truck['id']}",
+            **truck, "type": "truck", "color": [255, 45, 149, 235], "glyph": MAP_SYMBOL_GLYPH["truck"], "title": f"HazMat truck {truck['id']}",
             "details": f"{truck['substance']} · {truck['speed']} km/h · route {truck['route']}",
         } for truck in HAZMAT_TRUCKS], 72, 12)
         layers += point_layers("traffic-normal-incidents", [{
-            **acc, "color": [242, 100, 87, 235], "glyph": "X", "title": acc["title"],
+            **acc, "type": "traffic_incident", "color": [255, 89, 94, 235], "glyph": MAP_SYMBOL_GLYPH["traffic_incident"], "title": acc["title"],
             "details": f"{acc['road']} · {acc['severity']}",
         } for acc in ORDINARY_ACCIDENTS], 58, 11)
         layers += point_layers("traffic-active-incident", [{
-            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": "!",
+            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
         }], 92, 17)
         render_map(make_deck(layers, active.lat, active.lon, 12.25, 35, -8, use_basemap), "traffic-control-map", 675)
         render_map_legend([
-            ("!", "Active incident", "#F26457"),
-            ("T", "HazMat vehicle", "#FF2D95"),
-            ("X", "Ordinary traffic incident", "#FF3B30"),
-            ("", "Traffic: free / slow / congested", "#FFD60A"),
-            ("", "Road closure", "#FFFFFF"),
-            ("", "Emergency corridor", "#FFD60A"),
-            ("", "Evacuation route", "#B96BFF"),
-            ("", "HazMat bypass", "#FF2D95"),
+            (MAP_SYMBOL_GLYPH["incident"], "Active incident", "#FF595E"),
+            (MAP_SYMBOL_GLYPH["truck"], "HazMat vehicle", "#FF2D95"),
+            (MAP_SYMBOL_GLYPH["traffic_incident"], "Ordinary traffic incident", "#FF595E"),
+            ("━", "Traffic: free / slow / congested", "#FFD166"),
+            ("━", "Road closure", "#FFFFFF"),
+            ("━", "Emergency corridor", "#FFD166"),
+            ("━", "Evacuation route", "#B46AFF"),
+            ("━", "HazMat bypass", "#FF2D95"),
         ], "Traffic-control map legend")
         st.info(f"Preview: **{preview.title}**. All previously selected population and environmental measures remain overlaid for conflict checking.")
 
@@ -4561,33 +4741,33 @@ def page_environment() -> None:
         layers: List[pdk.Layer] = public_environment_layers("environment")
         layers.append(polygon_layer("environment-water-zones", [{
             **zone, "title": zone["name"], "details": "Sensitive water and ecological receptor",
-        } for zone in WATER_ZONES], [25, 116, 170, 82], [213, 242, 109, 225]))
+        } for zone in WATER_ZONES], [0, 168, 255, 70], [0, 168, 255, 225]))
         layers.append(polygon_layer("environment-plume", [{
             "polygon": incident_state["plume_polygon"], "title": "Air-impact zone",
             "details": f"Wind {wind_label(wind_direction)} · {wind_speed_kmh} km/h",
-        }], [242, 100, 87, 45], [242, 100, 87, 190]))
+        }], [255, 89, 94, 45], [255, 89, 94, 190]))
         layers += point_layers("environment-drains", [{
-            **drain, "color": [213, 242, 109, 240], "glyph": "D", "title": drain["name"],
+            **drain, "type": "drain", "color": [0, 217, 255, 240], "glyph": MAP_SYMBOL_GLYPH["drain"], "title": drain["name"],
             "details": "Stormwater pathway requiring protection",
         } for drain in DRAINS], 56, 11)
         layers += point_layers("environment-fixed-sensors", [{
-            **sensor, "color": [169, 191, 90, 240], "glyph": "S", "title": sensor["name"],
+            **sensor, "type": "sensor", "color": [255, 209, 102, 240], "glyph": MAP_SYMBOL_GLYPH["sensor"], "title": sensor["name"],
             "details": f"Status: {sensor['status']}",
         } for sensor in SENSORS], 58, 11)
         layers += decision_overlay_layers("environment-map", [preview])
         layers += point_layers("environment-active-incident", [{
-            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": "!",
+            "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": incident_state["substance"]["environment"],
         }], 92, 17)
         render_map(make_deck(layers, active.lat, active.lon, 12.65, 38, -8, use_basemap), "environment-protection-map", 675)
         render_map_legend([
-            ("!", "Active incident", "#F26457"),
-            ("", "Air-impact / toxic-plume zone", "#F26457"),
-            ("💧", "Water or ecological receptor", "#00A8FF"),
-            ("D", "Drain / stormwater pathway", "#00E5FF"),
-            ("S", "Environmental sensor", "#FFD60A"),
-            ("🌿", "Protected / environmental area", "#00FF85"),
-            ("", "Environmental containment / monitoring action", "#00FF85"),
+            (MAP_SYMBOL_GLYPH["incident"], "Active incident", "#FF595E"),
+            ("▰", "Air-impact / toxic-plume zone", "#FF595E"),
+            ("▰", "Water or ecological receptor", "#00A8FF"),
+            (MAP_SYMBOL_GLYPH["drain"], "Drain / stormwater pathway", "#00D9FF"),
+            (MAP_SYMBOL_GLYPH["sensor"], "Environmental sensor", "#FFD166"),
+            ("▰", "Protected / environmental area", "#00D68F"),
+            ("━", "Environmental containment / monitoring action", "#00D68F"),
         ], "Environmental-protection map legend")
         st.info(f"Preview: **{preview.title}**. Selected population and traffic actions stay visible to reveal overlaps with drains, sensors and containment areas.")
         st.caption(f"Public environmental polygons: {PROTECTED_AREA_SOURCE}. These complement the statutory planning references but are not represented as official ecological-redline boundaries.")
@@ -4701,8 +4881,8 @@ def consolidated_map_layers() -> List[pdk.Layer]:
             polygon_layer(
                 "plan-water",
                 [{**zone, "title": zone["name"], "details": "Water or wetland receptor"} for zone in WATER_ZONES],
-                [82, 161, 190, 48],
-                [82, 161, 190, 205],
+                [0, 168, 255, 48],
+                [0, 168, 255, 215],
             )
         )
     if show_traffic_layer:
@@ -4719,8 +4899,8 @@ def consolidated_map_layers() -> List[pdk.Layer]:
                     f"Wind {wind_label(wind_direction)} {wind_speed_kmh} km/h"
                 ),
             }],
-            [242, 100, 87, 58],
-            [242, 100, 87, 230],
+            [255, 89, 94, 58],
+            [255, 89, 94, 230],
         )
     )
 
@@ -4759,7 +4939,7 @@ def consolidated_map_layers() -> List[pdk.Layer]:
             [{
                 **shelter,
                 "color": [169, 191, 90, 235],
-                "glyph": "⛺",
+                "glyph": MAP_SYMBOL_GLYPH["shelter"],
                 "title": shelter["name"],
                 "details": f"Evacuation shelter · capacity {shelter['capacity']:,}",
             } for shelter in SHELTERS],
@@ -4773,7 +4953,7 @@ def consolidated_map_layers() -> List[pdk.Layer]:
             "lon": active.lon,
             "lat": active.lat,
             "color": THREAT_COLOR[active.threat] + [250],
-            "glyph": "⚠",
+            "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id,
             "details": active.description,
         }],
@@ -4793,28 +4973,32 @@ def page_plan() -> None:
         deck = make_deck(consolidated_map_layers(), active.lat, active.lon, 12.3, pitch, -10, use_basemap)
         render_map(deck, "consolidated-plan-map", 690)
         legend_items: List[Tuple[str, str, str]] = [
-            ("⚠", "Incident / leak source", "#F26457"),
-            ("", "Toxic plume and protective-action zone", "#F26457"),
+            (MAP_SYMBOL_GLYPH["incident"], "Incident / leak source", "#FF595E"),
+            ("▰", "Toxic plume and protective-action zone", "#FF595E"),
         ]
         if show_population_layer:
             legend_items += [
-                ("🏘", "Vulnerable destination and dynamic buffer", "#D5F26D"),
-                ("🏥", "Receiving hospital and availability", "#00A8FF"),
+                (MAP_SYMBOL_GLYPH["community"], "Vulnerable destination and dynamic buffer", "#FFD166"),
+                (MAP_SYMBOL_GLYPH["hospital"], "Receiving hospital and availability", "#00A8FF"),
             ]
         if show_resources_layer:
             legend_items += [
-                ("🚒", "Fire / HazMat origin or active unit", "#FF5E1F"),
-                ("🚓", "Police origin or active unit", "#00E5FF"),
-                ("🚑", "EMS origin or active unit", "#2F80FF"),
-                ("◉", "Halo = requested, en route or on scene", "#D5F26D"),
+                (MAP_SYMBOL_GLYPH["fire"], "Fire / HazMat origin or active unit", "#FF7E22"),
+                (MAP_SYMBOL_GLYPH["police"], "Police origin or active unit", "#00C4FF"),
+                (MAP_SYMBOL_GLYPH["ambulance"], "EMS origin or active unit", "#4C6FFF"),
+                ("◉", "Requested / en route / on scene halo", "#FFD166"),
             ]
         if show_routes_layer:
-            legend_items += [("", "Police route", "#00E5FF"), ("", "Fire route", "#FF5E1F"), ("", "HazMat route", "#FF2D95"), ("", "EMS route", "#2F80FF"), ("", "Evacuation route", "#B96BFF"), ("", "Environmental route", "#00FF85")]
+            legend_items += [("━", "Police route", "#00C4FF"), ("━", "Fire route", "#FF7E22"), ("━", "HazMat route", "#FF2D95"), ("━", "EMS route", "#4C6FFF"), ("━", "Evacuation route", "#B46AFF"), ("━", "Environmental route", "#00D68F")]
         if show_environment_layer or show_water_layer:
             legend_items += [
-                ("🌿", "Environmental protection receptor", "#00FF85"),
-                ("💧", "Water / wetland receptor", "#00A8FF"),
+                ("▰", "Environmental protection receptor", "#00D68F"),
+                ("▰", "Water / wetland receptor", "#00A8FF"),
             ]
+        if show_3d_buildings:
+            legend_items.append(("▥", "Illustrative building massing 3D", "#899FB2"))
+        if show_worldpop_3d:
+            legend_items.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
         render_map_legend(legend_items, "Consolidated plan legend")
 
         timeline = go.Figure()
@@ -5214,20 +5398,20 @@ def page_historical_study() -> None:
         if show_environment_layer:
             layers.extend(public_environment_layers("live-case"))
         if show_water_layer:
-            layers.append(polygon_layer("live-case-water", [{**zone, "title": zone["name"], "details": "Environmental receptor"} for zone in WATER_ZONES], [82, 161, 190, 50], [82, 161, 190, 195]))
+            layers.append(polygon_layer("live-case-water", [{**zone, "title": zone["name"], "details": "Environmental receptor"} for zone in WATER_ZONES], [0, 168, 255, 50], [0, 168, 255, 210]))
         if show_traffic_layer:
             layers.append(path_layer("live-case-traffic", traffic_path_data(), 7))
         layers.append(polygon_layer("live-case-plume", [{
             "polygon": live_plume,
             "title": f"{stage['title']} chlorine impact zone",
             "details": f"Live input · wind {wind_label(wind_direction)} {wind_speed_kmh} km/h",
-        }], [242, 100, 87, 64], [242, 100, 87, 235]))
+        }], [255, 89, 94, 64], [255, 89, 94, 235]))
 
         layers += vulnerability_buffer_layers("live-case")
         if show_labels_layer:
             priority_points = [{
                 **item,
-                "color": [242, 100, 87, 245] if idx == 0 else [213, 242, 109, 230],
+                "color": [255, 89, 94, 245] if idx == 0 else [213, 242, 109, 230],
                 "glyph": item.get("glyph", "🏘"),
                 "title": f"Priority {idx + 1} · {item['name']}",
                 "details": f"Dynamic priority {item['priority_score']:.1f}<br/>Population {item['population_now']:,}<br/>Distance {item['distance_m']} m",
@@ -5253,7 +5437,11 @@ def page_historical_study() -> None:
                 "color": AGENCY_COLOR[kind] + [235],
                 "width": 8,
                 "title": f"{AGENCY_LABEL[kind]} → {target['name']}",
-                "details": f"Origin: {resource.name}<br/>Mission: {target['name']}<br/>ETA {route.eta_min} min · {route.distance_km} km",
+                "details": (
+                    f"Origin: {resource.name}<br/>Destination: {target['name']}<br/>"
+                    f"Mission: {AGENCY_LABEL[kind]} deployment<br/>Status: recommended · awaiting human dispatch<br/>"
+                    f"ETA {route.eta_min} min · {route.distance_km} km<br/>Backend: {route.backend}"
+                ),
             })
             endpoint_data.extend([
                 {
@@ -5268,7 +5456,7 @@ def page_historical_study() -> None:
                 },
             ])
         if show_routes_layer and route_data:
-            layers.append(path_layer("live-case-mission-routes", route_data, 8))
+            layers += path_layers_with_halo("live-case-mission-routes", route_data, 8, halo_extra=5)
         if show_labels_layer and endpoint_data:
             layers += point_layers("live-case-route-endpoints", endpoint_data, 66, 20)
 
@@ -5279,23 +5467,30 @@ def page_historical_study() -> None:
                 layers += point_layers("live-case-resources", resources_data, 56, 19)
 
         layers += point_layers("live-case-incident", [{
-            "lon": active.lon, "lat": active.lat, "color": [242, 100, 87, 250], "glyph": "⚠",
+            "lon": active.lon, "lat": active.lat, "color": [255, 89, 94, 250], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": "Accident source", "details": "Jinghu Expressway Huai'an section · liquid chlorine release",
         }], 105, 23)
 
         pitch = 54 if (show_3d_buildings or show_worldpop_3d) else 40
         deck = make_deck(layers, active.lat, active.lon, 12.4, pitch, -10, use_basemap)
         render_map(deck, "live-case-map", 680)
-        render_map_legend([
-            ("⚠", "Leak source", "#F26457"),
-            ("🏘", "Ranked vulnerable village", "#D5F26D"),
-            ("🚓", "Police warning / road-control mission", "#00E5FF"),
-            ("🚒", "Fire source-control mission", "#FF5E1F"),
-            ("🚑", "EMS mission", "#2F80FF"),
-            ("🚌", "Evacuation pickup mission", "#B96BFF"),
-            ("🏥", "Receiving hospital", "#00A8FF"),
-            ("", "HazMat / specialist mission", "#FF2D95"), ("", "Environmental monitoring mission", "#00FF85"),
-        ], "Live response legend")
+        live_legend: List[Tuple[str, str, str]] = [
+            (MAP_SYMBOL_GLYPH["incident"], "Leak source", "#FF595E"),
+            ("▰", "Current toxic-plume zone", "#FF595E"),
+            (MAP_SYMBOL_GLYPH["community"], "Ranked vulnerable village", "#FF9F1C"),
+            (MAP_SYMBOL_GLYPH["police"], "Police warning / road-control mission", "#00C4FF"),
+            (MAP_SYMBOL_GLYPH["fire"], "Fire source-control mission", "#FF7E22"),
+            (MAP_SYMBOL_GLYPH["ambulance"], "EMS mission", "#4C6FFF"),
+            (MAP_SYMBOL_GLYPH["bus"], "Evacuation pickup mission", "#B46AFF"),
+            (MAP_SYMBOL_GLYPH["hospital"], "Receiving hospital", "#00A8FF"),
+            ("━", "HazMat / specialist mission", "#FF2D95"),
+            ("━", "Environmental monitoring mission", "#00D68F"),
+        ]
+        if show_3d_buildings:
+            live_legend.append(("▥", "Illustrative building massing 3D", "#899FB2"))
+        if show_worldpop_3d:
+            live_legend.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
+        render_map_legend(live_legend, "Live response legend")
 
     with insight_col:
         st.markdown(
@@ -5367,6 +5562,15 @@ def page_historical_study() -> None:
         )
 
 def page_agent() -> None:
+    if st.session_state.get("nav_page") == "SkyRoute AI Copilot":
+        return_label = st.session_state.get("agent_return_page", "Central & Prevention")
+        st.markdown(
+            f'<div class="sr-agent-return"><div class="sr-small">AI AGENT · return destination</div>'
+            f'<div class="sr-title">{return_label}</div></div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("← Back to previous workspace", key="agent-return-button", use_container_width=False):
+            return_from_agent()
     st.markdown('<div class="sr-h2">SkyRoute AI Copilot · operational intelligence core</div>', unsafe_allow_html=True)
     chat_col, context_col = st.columns([1.32, 1])
 
@@ -5486,6 +5690,15 @@ def page_incident_command() -> None:
             unsafe_allow_html=True,
         )
 
+    st.markdown('<div class="sr-map-view-bar"><div class="sr-small">MAP VIEW · 3D context can be switched off when a flatter tactical view is preferred.</div></div>', unsafe_allow_html=True)
+    view_a, view_b, view_c = st.columns([1.05, 1.05, 3.8])
+    with view_a:
+        st.toggle("3D buildings", key="show_3d_buildings")
+    with view_b:
+        st.toggle("Population 3D", key="show_worldpop_3d")
+    with view_c:
+        st.caption("Buildings are contextual massing; population columns express estimated presence and vulnerability, not surveyed height.")
+
     if active.id == HISTORICAL_INCIDENT_ID:
         current_stage = HISTORICAL_RECONSTRUCTION_STAGES[int(st.session_state.get("historical_stage", 0))]
         st.markdown(
@@ -5555,7 +5768,7 @@ PAGE_FUNCTIONS.get(page, page_central)()
 st.markdown(
     """
 <div class="sr-footer">
-SkyRoute / 天途 v12 · live vulnerability-aware emergency decision demonstrator.<br/>
+SkyRoute / 天途 v14 · live vulnerability-aware emergency decision demonstrator.<br/>
 Default positions, traffic, population estimates, plume geometry, hospital capacity and response scores are simulation inputs. The Huai'an 2005 scenario is presented as a live incident simulation based on a real event; operational map anchors and changing weather inputs remain modeling assumptions. No real dispatch is performed.<br/>
 Production deployment requires official emergency plans, validated vulnerability and dispersion models, licensed data, secure platform integration and final human command authority.
 </div>

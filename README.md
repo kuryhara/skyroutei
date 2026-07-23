@@ -78,3 +78,13 @@ The vector SkyRoute 天途 logo is stored in `assets/skyroute_tiantu_vector.svg`
 - Data, map-layer and scenario controls are grouped in a collapsible Operational controls panel.
 - Operational line colours now prioritise contrast and semantic distinction on dark maps:
   police cyan, fire orange, HazMat magenta, EMS blue, evacuation violet, environment green, closure white, and traffic green/yellow/red.
+
+## v14 interface and map update
+
+- Removes the global `Operational workspace` radio from rendering and navigation state.
+- Adds persistent buttons for City Command, Incident Command, Cases & Data, and Ask SkyRoute AI.
+- The AI agent remembers the previous workspace and provides a return button.
+- Uses a high-contrast operational map palette with redundant color + geometric-shape coding.
+- Adds dark route halos and stronger emphasis for the AI-recommended route.
+- Enables optional 3D building massing and population/vulnerability volumes in incident command.
+- Map legends use the same geometric symbols, line swatches, and area swatches shown on maps.
