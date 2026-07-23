@@ -1,5 +1,5 @@
 """
-SkyRoute / 天途 v21 — Compact Layer Toolbar and Flat Map Icons
+SkyRoute / 天途 v25 — Guided Presentation and Urban Context
 ==================================================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
@@ -78,7 +78,7 @@ except ImportError:  # pragma: no cover
 # PAGE AND VISUAL SYSTEM
 # =============================================================================
 st.set_page_config(
-    page_title="SkyRoute v16 | SkyTech CCO",
+    page_title="SkyRoute | Emergency Decision Support",
     page_icon="🛰️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -214,7 +214,7 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-top{{border-color:#768C45;background:linear-gradient(135deg,rgba(24,39,29,.97),rgba(6,17,14,.99));}}
 .sr-logo{{display:none;}}
 .sr-map-info-anchor{{position:relative;height:0;z-index:999;pointer-events:none;}}
-.sr-map-native-info-mask{{position:absolute;right:0;width:48px;height:48px;background:#06110E;border-top-left-radius:12px;pointer-events:none;z-index:1;}}
+.sr-map-native-info-mask{{position:absolute;right:0;width:300px;height:28px;background:linear-gradient(90deg,rgba(6,17,14,0),#06110E 18%);border-top-left-radius:12px;pointer-events:none;z-index:1;}}
 .sr-map-info-control{{position:absolute;right:12px;pointer-events:auto;z-index:2;}}
 .sr-map-info-control summary{{list-style:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:rgba(5,15,28,.96);border:1px solid #FFFFFF;color:#FFFFFF;font:700 14px 'Poppins';box-shadow:0 0 13px rgba(255,255,255,.22),0 0 20px rgba(0,229,255,.11);user-select:none;}}
 .sr-map-info-control summary::-webkit-details-marker{{display:none;}}
@@ -222,6 +222,8 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-map-info-control[open] summary{{border-color:#00E5FF;color:#00E5FF;}}
 .sr-map-info-panel{{position:absolute;right:0;bottom:38px;width:255px;border:1px solid #00E5FF;border-radius:10px;padding:10px 11px;background:rgba(4,13,24,.98);color:#DCE9F2;box-shadow:0 12px 34px rgba(0,0,0,.48),0 0 20px rgba(0,229,255,.12);font:9px 'JetBrains Mono';line-height:1.55;}}
 .sr-map-info-panel b{{display:block;color:#FFFFFF;font:700 11px 'Poppins';margin-bottom:5px;}}
+.sr-map-north{{position:absolute;right:12px;top:12px;z-index:2;width:30px;height:46px;border:1px solid rgba(255,255,255,.35);border-radius:15px;background:rgba(5,15,28,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font:700 9px 'JetBrains Mono';box-shadow:0 6px 18px rgba(0,0,0,.28);}}
+.sr-map-north:after{{content:'';width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:11px solid #D5F26D;margin-top:3px;filter:drop-shadow(0 0 5px rgba(213,242,109,.55));}}
 .sr-map-legend{{border:1px solid #405334;border-radius:12px;padding:10px 12px;background:rgba(6,17,14,.94);margin:7px 0 12px;}}
 .sr-map-legend-title{{font-family:'Poppins';font-size:11px;font-weight:700;color:#D5F26D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}}
 .sr-map-legend-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px 12px;}}
@@ -291,6 +293,34 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-data-cell b{{font-family:'Poppins';color:#F2F6E8;}}
 .sr-data-note{{border-left:3px solid #00E5FF;border-radius:0 9px 9px 0;background:rgba(0,229,255,.045);padding:10px 12px;font:9px 'JetBrains Mono';line-height:1.55;color:#B7C99D;margin:8px 0 12px;}}
 @media (max-width:1100px){{.sr-data-grid{{grid-template-columns:repeat(2,minmax(0,1fr));}}.sr-case-strip{{grid-template-columns:repeat(2,minmax(0,1fr));}}.sr-data-row{{grid-template-columns:1fr;gap:4px;}}.sr-data-row.header{{display:none;}}}}
+
+/* Header actions and guided presentation */
+[class*="st-key-header_action_"] [data-testid="stButton"] button{{height:34px!important;min-height:34px!important;padding:0 11px!important;font:700 9px 'JetBrains Mono'!important;white-space:nowrap!important;}}
+[class*="st-key-header_action_present"] [data-testid="stButton"] button{{border-color:#D5F26D!important;background:rgba(213,242,109,.10)!important;color:#F2F6E8!important;}}
+.sr-presentation-shell{{border:1px solid rgba(213,242,109,.34);border-radius:16px;background:linear-gradient(145deg,rgba(8,24,19,.97),rgba(3,10,8,.99));padding:18px 20px;margin:4px 0 12px;box-shadow:0 18px 50px rgba(0,0,0,.30),0 0 32px rgba(213,242,109,.07);}}
+.sr-presentation-kicker{{font:700 8px 'JetBrains Mono';letter-spacing:.16em;text-transform:uppercase;color:#52A1BE;}}
+.sr-presentation-title{{font:700 clamp(25px,3.1vw,48px) 'Poppins';line-height:1.05;color:#F2F6E8;margin-top:8px;max-width:1100px;}}
+.sr-presentation-title em{{font-style:normal;color:#D5F26D;text-shadow:0 0 14px rgba(213,242,109,.22);}}
+.sr-presentation-copy{{font:12px/1.65 'Poppins';color:#B7C99D;max-width:1000px;margin-top:10px;}}
+.sr-presentation-impact{{border-left:3px solid #D5F26D;background:rgba(213,242,109,.06);padding:12px 14px;border-radius:0 10px 10px 0;font:700 16px/1.4 'Poppins';color:#F2F6E8;margin:12px 0;}}
+.sr-module-grid{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:9px 0 12px;}}
+.sr-module-card{{border:1px solid #405334;border-radius:10px;background:rgba(5,16,13,.9);padding:10px;min-height:92px;}}
+.sr-module-card.active{{border-color:#D5F26D;box-shadow:0 0 16px rgba(213,242,109,.07);}}
+.sr-module-name{{font:700 10px 'Poppins';color:#F2F6E8;}}
+.sr-module-state{{font:700 7.5px 'JetBrains Mono';letter-spacing:.10em;color:#D5F26D;text-transform:uppercase;margin-top:4px;}}
+.sr-module-detail{{font:8.5px/1.45 'JetBrains Mono';color:#91A87A;margin-top:6px;}}
+.sr-route-compare{{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:9px 0;}}
+.sr-route-choice{{border:1px solid #405334;border-radius:12px;padding:12px;background:rgba(5,16,13,.88);}}
+.sr-route-choice.fast{{border-top:3px solid #00D9FF;}}
+.sr-route-choice.safe{{border-top:3px solid #00E6A0;box-shadow:0 0 22px rgba(0,230,160,.07);}}
+.sr-route-choice .name{{font:700 13px 'Poppins';color:#F2F6E8;}}
+.sr-route-choice .value{{font:700 23px 'Poppins';margin-top:6px;}}
+.sr-route-choice .meta{{font:9px/1.6 'JetBrains Mono';color:#B7C99D;margin-top:6px;}}
+.sr-agent-trace{{border:1px solid #405334;border-radius:12px;background:rgba(4,13,10,.92);padding:12px 14px;}}
+.sr-agent-trace-row{{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid rgba(64,83,52,.45);font:9px 'JetBrains Mono';color:#D6E2C6;}}
+.sr-agent-trace-row:last-child{{border-bottom:none;}}
+.sr-agent-trace-row span:first-child{{color:#D5F26D;}}
+@media(max-width:900px){{.sr-module-grid{{grid-template-columns:1fr 1fr;}}.sr-route-compare{{grid-template-columns:1fr;}}}}
 
 </style>
 """,
@@ -1573,6 +1603,125 @@ def load_public_protected_areas(center_lat: float = 32.160, center_lon: float = 
     return areas, label
 
 
+@st.cache_data(ttl=86_400, show_spinner=False)
+def load_public_urban_context(
+    center_lat: float,
+    center_lon: float,
+    landuse_radius_m: int = 6_000,
+    building_radius_m: int = 2_800,
+) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]], str]:
+    """Load flat OSM land-use polygons and building footprints.
+
+    Building geometry is deliberately rendered as a two-dimensional boundary:
+    it is orientation context only and is never used as a height, occupancy,
+    vulnerability or routing input.
+    """
+    if not OSMNX_AVAILABLE or ox is None:
+        return [], [], "OpenStreetMap urban context unavailable · optional OSMnx package not installed"
+
+    feature_loader = getattr(ox, "features_from_point", None)
+    if feature_loader is None and getattr(ox, "features", None) is not None:
+        feature_loader = getattr(ox.features, "features_from_point", None)
+    if feature_loader is None:
+        return [], [], "OpenStreetMap urban context unavailable · incompatible OSMnx version"
+
+    landuse_items: List[Dict[str, Any]] = []
+    building_items: List[Dict[str, Any]] = []
+    def clean_tag(row: Any, *keys: str) -> str:
+        for key in keys:
+            value = row.get(key)
+            if value is None:
+                continue
+            try:
+                if bool(pd.isna(value)):
+                    continue
+            except (TypeError, ValueError):
+                pass
+            if str(value).strip():
+                return str(value).strip()
+        return ""
+
+    land_colors = {
+        "residential": [82, 161, 190, 24],
+        "commercial": [180, 106, 255, 25],
+        "industrial": [242, 100, 87, 26],
+        "retail": [255, 209, 102, 24],
+        "forest": [0, 214, 143, 29],
+        "grass": [169, 191, 90, 25],
+        "farmland": [118, 140, 69, 25],
+        "cemetery": [148, 163, 184, 22],
+        "construction": [255, 159, 28, 23],
+    }
+
+    try:
+        land_gdf = feature_loader(
+            (center_lat, center_lon),
+            tags={"landuse": True, "leisure": ["park", "garden"], "natural": ["wood", "grassland"]},
+            dist=landuse_radius_m,
+        )
+        for index, row in land_gdf.iterrows():
+            rings = _geometry_polygons(row.get("geometry"))
+            if not rings:
+                continue
+            leisure = clean_tag(row, "leisure")
+            category = clean_tag(row, "landuse") or ("park" if leisure in {"park", "garden"} else "") or clean_tag(row, "natural") or "mapped land use"
+            name = clean_tag(row, "name:en", "name") or category.replace("_", " ").title()
+            fill = land_colors.get(category, [82, 161, 190, 20])
+            for ring in rings:
+                landuse_items.append({
+                    "id": f"OSM-LAND-{len(landuse_items) + 1}",
+                    "polygon": ring,
+                    "fill_color": fill,
+                    "line_color": [130, 168, 148, 115],
+                    "title": str(name),
+                    "details": f"Land use: {category}<br/>Source: OpenStreetMap · ODbL",
+                })
+                if len(landuse_items) >= 180:
+                    break
+            if len(landuse_items) >= 180:
+                break
+    except Exception:
+        landuse_items = []
+
+    try:
+        building_gdf = feature_loader(
+            (center_lat, center_lon),
+            tags={"building": True},
+            dist=building_radius_m,
+        )
+        for index, row in building_gdf.iterrows():
+            rings = _geometry_polygons(row.get("geometry"))
+            if not rings:
+                continue
+            building_type = clean_tag(row, "building") or "building"
+            name = clean_tag(row, "name:en", "name") or "Mapped building footprint"
+            for ring in rings:
+                building_items.append({
+                    "id": f"OSM-BLDG-{len(building_items) + 1}",
+                    "polygon": ring,
+                    "fill_color": [150, 176, 166, 17],
+                    "line_color": [190, 215, 205, 105],
+                    "title": str(name),
+                    "details": (
+                        f"Flat building footprint · {building_type}<br/>"
+                        "Source: OpenStreetMap · ODbL<br/>"
+                        "Visual context only; no height or occupancy inferred."
+                    ),
+                })
+                if len(building_items) >= 420:
+                    break
+            if len(building_items) >= 420:
+                break
+    except Exception:
+        building_items = []
+
+    status = (
+        f"OpenStreetMap · ODbL · {len(landuse_items)} land-use polygon(s) · "
+        f"{len(building_items)} flat building footprint(s)"
+    )
+    return landuse_items, building_items, status
+
+
 # =============================================================================
 # SIMULATION, TRAFFIC, ROUTING AND DECISION ENGINE
 # =============================================================================
@@ -2530,8 +2679,14 @@ def init_state() -> None:
         "show_worldpop_3d": False,
         "layer_population": True,
         "layer_environment": True,
+        "layer_landuse": True,
+        "layer_buildings": True,
         "layer_resources": True,
         "layer_traffic_routes": True,
+        "presentation_step": 0,
+        "presentation_hour": 14,
+        "presentation_replan_stage": "Initial incident",
+        "presentation_return_page": "Central & Prevention",
         "active_incident_id": INCIDENTS[0].id,
         "selected_alert_id": None,
         "incident_tab": "Overview",
@@ -2587,6 +2742,19 @@ def return_from_agent() -> None:
     st.session_state.nav_page = return_page
     if return_page == "Incident Command":
         st.session_state.incident_tab = st.session_state.get("agent_return_incident_tab", "Overview")
+    st.rerun()
+
+
+def open_presentation() -> None:
+    current_page = st.session_state.get("nav_page", "Central & Prevention")
+    if current_page != "Presentation":
+        st.session_state.presentation_return_page = current_page
+    st.session_state.nav_page = "Presentation"
+    st.rerun()
+
+
+def exit_presentation() -> None:
+    st.session_state.nav_page = st.session_state.get("presentation_return_page", "Central & Prevention")
     st.rerun()
 
 
@@ -2918,6 +3086,42 @@ def public_environment_layers(prefix: str) -> List[pdk.Layer]:
     )]
 
 
+def urban_context_layers(prefix: str) -> List[pdk.Layer]:
+    """Return quiet, flat context layers beneath operational overlays."""
+    layers: List[pdk.Layer] = []
+    landuse, buildings, _ = load_public_urban_context(active.lat, active.lon)
+    if show_landuse_layer and landuse:
+        layers.append(pdk.Layer(
+            "PolygonLayer",
+            id=f"{prefix}-osm-landuse",
+            data=landuse,
+            get_polygon="polygon",
+            get_fill_color="fill_color",
+            get_line_color="line_color",
+            filled=True,
+            stroked=True,
+            line_width_min_pixels=1,
+            pickable=True,
+            auto_highlight=True,
+        ))
+    if show_buildings_layer and buildings:
+        layers.append(pdk.Layer(
+            "PolygonLayer",
+            id=f"{prefix}-osm-buildings",
+            data=buildings,
+            get_polygon="polygon",
+            get_fill_color="fill_color",
+            get_line_color="line_color",
+            filled=True,
+            stroked=True,
+            line_width_min_pixels=1,
+            pickable=True,
+            auto_highlight=True,
+            parameters={"depthTest": False},
+        ))
+    return layers
+
+
 def make_deck(
     layers: List[pdk.Layer],
     latitude: float,
@@ -2962,14 +3166,18 @@ def render_map_info(height: int) -> None:
     st.markdown(
         f"""
         <div class="sr-map-info-anchor">
+          <div class="sr-map-north" title="North indicator">N</div>
           <div class="sr-map-native-info-mask" style="top:{mask_offset}px"></div>
           <details class="sr-map-info-control" style="top:{top_offset}px">
-            <summary title="Map help — hover for object details or click to open instructions">i</summary>
+            <summary title="Map help and data sources">i</summary>
             <div class="sr-map-info-panel">
               <b>Map interaction</b>
               Hover over routes, facilities, targets and operational zones to see their name and details.<br/><br/>
               Left-drag to pan · right-drag to rotate and change pitch · scroll to zoom.<br/><br/>
-              Hold Ctrl while scrolling when the page captures the wheel. On selectable maps, click a highlighted object to open its decision preview.
+              Hold Ctrl while scrolling when the page captures the wheel. On selectable maps, click a highlighted object to open its decision preview.<br/><br/>
+              <b>Map and context sources</b>
+              Basemap, streets, land use and flat building footprints: OpenStreetMap contributors / ODbL, rendered with CARTO and PyDeck. Routing uses configured ORS, OSRM, OSMnx or AMap connectors. Population, weather, traffic and incident overlays are identified as public, estimated or simulated in the Data view.<br/><br/>
+              Building outlines are visual context only. No height, occupancy or structural condition is inferred.
             </div>
           </details>
         </div>
@@ -3586,6 +3794,8 @@ use_basemap = True
 ors_api_key = "" if ors_is_local() else get_ors_key()
 
 show_population_layer = bool(st.session_state.get("layer_population", True))
+show_landuse_layer = bool(st.session_state.get("layer_landuse", True))
+show_buildings_layer = bool(st.session_state.get("layer_buildings", True))
 show_resources_layer = bool(st.session_state.get("layer_resources", True))
 show_routes_layer = bool(st.session_state.get("layer_traffic_routes", True))
 show_traffic_layer = bool(st.session_state.get("layer_traffic_routes", True))
@@ -3676,8 +3886,10 @@ preventive_alerts = build_preventive_alerts(
 # =============================================================================
 # TOP BAR AND METRICS
 # =============================================================================
-st.markdown(
-    f"""
+header_main, header_data, header_present = st.columns([7.2, 0.72, 1.2], gap="small", vertical_alignment="center")
+with header_main:
+    st.markdown(
+        f"""
 <div class="sr-top">
  <div class="sr-brand">{skyroute_logo_html()}<div><div class="sr-sub">{"Huai’an live chlorine response simulation" if active.id == HISTORICAL_INCIDENT_ID else "Global emergency prevention, routing and incident command"}</div></div></div>
  <div class="sr-topstats">
@@ -3688,38 +3900,44 @@ st.markdown(
  </div>
 </div>
 """,
-    unsafe_allow_html=True,
-)
+        unsafe_allow_html=True,
+    )
+with header_data:
+    with st.container(key="header_action_data"):
+        if st.button("Data", key="header-data", use_container_width=True, disabled=page == "Cases & Data"):
+            navigate_to("Cases & Data")
+with header_present:
+    with st.container(key="header_action_present"):
+        if st.button("▶ Presentation", key="header-presentation", use_container_width=True, disabled=page == "Presentation"):
+            open_presentation()
 
-st.markdown('<div class="sr-global-nav"><div class="sr-global-nav-label">Primary navigation</div></div>', unsafe_allow_html=True)
-nav_city, nav_incident, nav_cases, nav_ai = st.columns([1.05, 1.18, 1.0, 1.32])
-with nav_city:
-    if st.button("City command", key="global-nav-city", use_container_width=True, disabled=page == "Central & Prevention"):
-        navigate_to("Central & Prevention")
-with nav_incident:
-    if st.button("Incident command", key="global-nav-incident", use_container_width=True, disabled=page == "Incident Command"):
-        navigate_to("Incident Command", st.session_state.get("incident_tab", "Overview"))
-with nav_cases:
-    if st.button("Cases & data", key="global-nav-cases", use_container_width=True, disabled=page == "Cases & Data"):
-        navigate_to("Cases & Data")
-with nav_ai:
-    if st.button("✦ Ask SkyRoute AI", key="global-nav-agent", type="primary", use_container_width=True, disabled=page == "SkyRoute AI Copilot"):
-        open_agent()
+if page != "Presentation":
+    st.markdown('<div class="sr-global-nav"><div class="sr-global-nav-label">Primary navigation</div></div>', unsafe_allow_html=True)
+    nav_city, nav_incident, nav_ai = st.columns([1.05, 1.18, 1.32])
+    with nav_city:
+        if st.button("City command", key="global-nav-city", use_container_width=True, disabled=page == "Central & Prevention"):
+            navigate_to("Central & Prevention")
+    with nav_incident:
+        if st.button("Incident command", key="global-nav-incident", use_container_width=True, disabled=page == "Incident Command"):
+            navigate_to("Incident Command", st.session_state.get("incident_tab", "Overview"))
+    with nav_ai:
+        if st.button("✦ Ask SkyRoute AI", key="global-nav-agent", type="primary", use_container_width=True, disabled=page == "SkyRoute AI Copilot"):
+            open_agent()
 
-metric_items = [
-    ("Threat", active.threat, f"{active.substance} · {active.quantity_t:.0f} t", RED),
-    ("Protective zone", f"{incident_state['protective_distance']/1000:.1f} km", f"isolation {incident_state['isolation_distance']} m", AMBER),
-    ("People exposed", f"{incident_state['exposed_population']:,}", f"{len(incident_state['exposed_pois'])} mapped settings", PURPLE),
-    ("Agent action", incident_state["recommendation"], f"confidence {incident_state['confidence']:.0%} · {len(selected_decisions())} decisions", CYAN),
-    ("Prevention risk", f"{prevention_value}/100", prevention_level, TEAL if prevention_value < 35 else AMBER if prevention_value < 70 else RED),
-]
-metric_cols = st.columns(5)
-for col, (key, value, detail, color) in zip(metric_cols, metric_items):
-    with col:
-        st.markdown(
-            f'<div class="sr-card" style="border-top:2px solid {color}"><div class="k">{key}</div><div class="v">{value}</div><div class="d">{detail}</div></div>',
-            unsafe_allow_html=True,
-        )
+    metric_items = [
+        ("Threat", active.threat, f"{active.substance} · {active.quantity_t:.0f} t", RED),
+        ("Protective zone", f"{incident_state['protective_distance']/1000:.1f} km", f"isolation {incident_state['isolation_distance']} m", AMBER),
+        ("People exposed", f"{incident_state['exposed_population']:,}", f"{len(incident_state['exposed_pois'])} mapped settings", PURPLE),
+        ("Agent action", incident_state["recommendation"], f"confidence {incident_state['confidence']:.0%} · {len(selected_decisions())} decisions", CYAN),
+        ("Prevention risk", f"{prevention_value}/100", prevention_level, TEAL if prevention_value < 35 else AMBER if prevention_value < 70 else RED),
+    ]
+    metric_cols = st.columns(5)
+    for col, (key, value, detail, color) in zip(metric_cols, metric_items):
+        with col:
+            st.markdown(
+                f'<div class="sr-card" style="border-top:2px solid {color}"><div class="k">{key}</div><div class="v">{value}</div><div class="d">{detail}</div></div>',
+                unsafe_allow_html=True,
+            )
 
 
 # =============================================================================
@@ -4256,17 +4474,19 @@ def render_map_layer_controls(scope: str) -> None:
     """Render a small pill-style map-layer toolbar."""
     global show_population_layer, show_environment_layer, show_water_layer
     global show_resources_layer, show_routes_layer, show_traffic_layer
-    global show_3d_buildings
+    global show_landuse_layer, show_buildings_layer, show_3d_buildings
 
     layer_specs = [
         ("population", "layer_population", "Vulnerable population targets and exposure buffers"),
         ("environment", "layer_environment", "Water, protected areas and environmental receptors"),
+        ("land use", "layer_landuse", "OpenStreetMap land-use polygons"),
+        ("buildings", "layer_buildings", "Flat OpenStreetMap building footprints; no 3D height"),
         ("resources", "layer_resources", "Police, fire, HazMat, EMS and support resources"),
         ("routes", "layer_traffic_routes", "Traffic state, corridors and operational routes"),
     ]
 
     with st.container(key=f"layer_toolbar_{scope}"):
-        columns = st.columns([0.78, 1.12, 1.22, 1.03, 0.96], gap="small", vertical_alignment="center")
+        columns = st.columns([0.72, 1.04, 1.12, 0.94, 1.0, 0.96, 0.82], gap="small", vertical_alignment="center")
         with columns[0]:
             st.markdown(
                 '<div class="sr-layer-inline-label" title="Map layers">'
@@ -4294,6 +4514,8 @@ def render_map_layer_controls(scope: str) -> None:
     show_population_layer = bool(st.session_state.get("layer_population", True))
     show_environment_layer = bool(st.session_state.get("layer_environment", True))
     show_water_layer = show_environment_layer
+    show_landuse_layer = bool(st.session_state.get("layer_landuse", True))
+    show_buildings_layer = bool(st.session_state.get("layer_buildings", True))
     show_resources_layer = bool(st.session_state.get("layer_resources", True))
     show_routes_layer = bool(st.session_state.get("layer_traffic_routes", True))
     show_traffic_layer = show_routes_layer
@@ -4357,9 +4579,7 @@ def page_central() -> None:
         # stretching across the full application width.
         render_map_layer_controls("city")
         layers: List[pdk.Layer] = []
-        building_layer = illustrative_buildings_layer("city")
-        if building_layer:
-            layers.append(building_layer)
+        layers.extend(urban_context_layers("city"))
         if show_environment_layer:
             layers.extend(public_environment_layers("city"))
         if show_population_layer:
@@ -4488,10 +4708,8 @@ def page_incident_overview() -> None:
         # Match the layer controls to the map width for a cleaner visual hierarchy.
         render_map_layer_controls("incident")
         layers: List[pdk.Layer] = []
-        building_layer = illustrative_buildings_layer("incident")
         pop3d_layer = worldpop_3d_layer("incident")
-        if building_layer:
-            layers.append(building_layer)
+        layers.extend(urban_context_layers("incident"))
         if pop3d_layer:
             layers.append(pop3d_layer)
         if show_environment_layer:
@@ -4670,10 +4888,8 @@ def page_population() -> None:
 
     with map_col:
         layers: List[pdk.Layer] = []
-        building_layer = illustrative_buildings_layer("population")
         pop3d_layer = worldpop_3d_layer("population")
-        if building_layer:
-            layers.append(building_layer)
+        layers.extend(urban_context_layers("population"))
         if pop3d_layer:
             layers.append(pop3d_layer)
         layers.append(polygon_layer("pop-plume", [{
@@ -4823,9 +5039,7 @@ def page_dispatch() -> None:
                 })
 
         layers: List[pdk.Layer] = []
-        building_layer = illustrative_buildings_layer("dispatch")
-        if building_layer:
-            layers.append(building_layer)
+        layers.extend(urban_context_layers("dispatch"))
         if show_environment_layer:
             layers.extend(public_environment_layers("dispatch"))
         if show_traffic_layer:
@@ -5095,7 +5309,7 @@ def reset_demo() -> None:
 
 def consolidated_map_layers() -> List[pdk.Layer]:
     """Build the complete operational map without hiding existing decision layers."""
-    layers: List[pdk.Layer] = []
+    layers: List[pdk.Layer] = urban_context_layers("plan")
 
     if show_environment_layer:
         layers.extend(public_environment_layers("plan"))
@@ -5609,10 +5823,8 @@ def page_historical_study() -> None:
             stage["plume_width_m"],
         )
         layers: List[pdk.Layer] = []
-        building_layer = illustrative_buildings_layer("live-case")
         pop3d_layer = worldpop_3d_layer("live-case")
-        if building_layer:
-            layers.append(building_layer)
+        layers.extend(urban_context_layers("live-case"))
         if pop3d_layer:
             layers.append(pop3d_layer)
         if show_environment_layer:
@@ -5843,6 +6055,430 @@ def page_agent() -> None:
 
 
 # =============================================================================
+# GUIDED PRESENTATION — CONTROLLED CASE STUDY INSIDE THE PRODUCT
+# =============================================================================
+PRESENTATION_STEPS = [
+    {
+        "kicker": "01 · Preventive intelligence",
+        "title": "Risk begins <em>before impact.</em>",
+        "copy": "SkyRoute can treat forecast rain, rising congestion and hazardous-material flow as preventive conditions. Rain is not presented as an accident: it is a signal that may increase the probability or consequence of a future road event.",
+        "impact": "The agent identifies changing conditions early enough for preventive action.",
+        "modules": {"Traffic", "Environment"},
+    },
+    {
+        "kicker": "02 · Dynamic population",
+        "title": "Vulnerability changes <em>with the clock.</em>",
+        "copy": "Protection priorities are based on who is estimated to be present at the time of the event. A school can be critical at 14:00 and nearly empty at 02:00, when residential areas become the priority.",
+        "impact": "The same incident location can require a different decision at a different hour.",
+        "modules": {"Population", "Traffic"},
+    },
+    {
+        "kicker": "03 · Route decision",
+        "title": "The fastest route is <em>not always the safest.</em>",
+        "copy": "Candidate routes are compared across travel time, modeled congestion, population exposure, vulnerable groups and environmental sensitivity. The commander sees the trade-off before authorizing a mission.",
+        "impact": "Four additional minutes can reduce potential vulnerable exposure by 78%.",
+        "modules": {"Population", "Dispatch", "Traffic", "Environment"},
+    },
+    {
+        "kicker": "04 · Continuous replanning",
+        "title": "When conditions change, <em>the plan changes.</em>",
+        "copy": "During a real incident, heavy rain, a wind shift, a secondary road crash or resource unavailability can invalidate the first plan. SkyRoute initiates a new deterministic comparison and presents the change for command review.",
+        "impact": "A recommendation is a living operational state — not a static answer.",
+        "modules": {"Dispatch", "Traffic", "Environment"},
+    },
+    {
+        "kicker": "05 · Agent orchestration",
+        "title": "An orchestration agent — <em>not a chatbot.</em>",
+        "copy": "Deterministic tools calculate routes, exposure and hazard geometry. The SkyRoute agent coordinates those tools, tracks changing inputs, explains why the recommendation changed and prepares an auditable decision for a human commander.",
+        "impact": "The agent coordinates. The models calculate. The human decides.",
+        "modules": {"Population", "Dispatch", "Traffic", "Environment"},
+    },
+]
+
+PRESENTATION_MODULE_DETAILS = {
+    "Population": "Dynamic occupancy · vulnerable groups · exposed population · priority targets",
+    "Dispatch": "Capability matching · resource availability · mission assignment · human authorization",
+    "Traffic": "Fastest vs safer routes · congestion · road closures · secondary crashes",
+    "Environment": "Preventive rain forecast · incident wind and rain · plume · water receptors",
+}
+
+
+def presentation_module_grid(active_modules: set) -> None:
+    cards = []
+    for module, detail in PRESENTATION_MODULE_DETAILS.items():
+        state = "active in this step" if module in active_modules else "available module"
+        cards.append(
+            f'<div class="sr-module-card {"active" if module in active_modules else ""}">'
+            f'<div class="sr-module-name">{module}</div><div class="sr-module-state">{state}</div>'
+            f'<div class="sr-module-detail">{detail}</div></div>'
+        )
+    st.markdown(f'<div class="sr-module-grid">{"".join(cards)}</div>', unsafe_allow_html=True)
+    with st.expander("Explore the four operational functions"):
+        columns = st.columns(4)
+        explanations = {
+            "Population": "Estimates presence by time of day, identifies schools, hospitals, older people and residential communities, then measures potential exposure for every option.",
+            "Dispatch": "Matches the mission with the right agency and capability, checks availability and ETA, and keeps dispatch blocked until human confirmation.",
+            "Traffic": "Calculates road-following alternatives and evaluates time, congestion, closures, secondary crashes and responder access.",
+            "Environment": "Uses forecast conditions preventively; during an incident it also evaluates wind, rain, plume movement, drainage and sensitive water or ecological receptors.",
+        }
+        for column, module in zip(columns, ["Population", "Dispatch", "Traffic", "Environment"]):
+            with column:
+                st.markdown(
+                    f'<div class="sr-panel"><div class="sr-title">{module}</div>'
+                    f'<div class="sr-body">{explanations[module]}</div></div>',
+                    unsafe_allow_html=True,
+                )
+
+
+def presentation_route_options() -> Tuple[Optional[Resource], Dict[str, RouteResult]]:
+    candidates = [
+        item for item in RESOURCES
+        if item.kind == "hazmat" and st.session_state.dispatch_status.get(item.id, item.status) != "Busy"
+    ]
+    if not candidates:
+        return None, {}
+    resource = min(candidates, key=lambda item: dist_m(item.lat, item.lon, active.lat, active.lon))
+    options = build_route_options(resource, active, traffic_segments, routing_backend, amap_key, ors_api_key)
+    return resource, options
+
+
+def presentation_context_layers(prefix: str, include_incident: bool = True) -> List[pdk.Layer]:
+    layers: List[pdk.Layer] = urban_context_layers(prefix)
+    layers.extend(public_environment_layers(prefix))
+    if traffic_path_data():
+        layers.append(path_layer(f"{prefix}-traffic", traffic_path_data(), 6))
+    if include_incident:
+        layers.append(polygon_layer(
+            f"{prefix}-plume",
+            [{
+                "polygon": incident_state["plume_polygon"],
+                "title": "Modeled protective-action zone",
+                "details": f"Wind {wind_label(wind_direction)} {wind_speed_kmh} km/h · scenario estimate",
+            }],
+            [255, 89, 94, 44],
+            [255, 89, 94, 210],
+        ))
+        layers += incident_icon_layers(f"{prefix}-incident", [{
+            "id": active.id,
+            "lon": active.lon,
+            "lat": active.lat,
+            "title": f"{active.id} · {active.substance}",
+            "details": "Demonstration incident used for the guided case study.",
+        }])
+    return layers
+
+
+def render_presentation_prevention() -> None:
+    alert = preventive_alerts[0] if preventive_alerts else None
+    map_col, note_col = st.columns([1.55, 1])
+    with map_col:
+        layers = presentation_context_layers("presentation-prevention", include_incident=False)
+        if alert:
+            layers += path_layers_with_halo("presentation-preventive-risk", [{
+                "path": alert.path,
+                "color": [255, 89, 94, 235],
+                "width": 9,
+                "title": "Forecast-sensitive road segment",
+                "details": alert.reason,
+            }], 9, halo_extra=4)
+            alternative = preventive_alternative_path(alert)
+            if alternative:
+                layers += path_layers_with_halo("presentation-preventive-alt", [{
+                    "path": alternative,
+                    "color": [0, 217, 255, 245],
+                    "width": 8,
+                    "title": "Preventive alternative",
+                    "details": alert.recommended_action,
+                }], 8, halo_extra=4)
+        layers += point_layers("presentation-preventive-crashes", [{
+            **item,
+            "type": "traffic_incident",
+            "color": [255, 209, 102, 235],
+            "title": item["title"],
+            "details": f"Existing road event used as a risk input · {item['road']}",
+        } for item in ORDINARY_ACCIDENTS], 55, 18)
+        render_map(make_deck(layers, 32.160, 118.704, 11.45, 44, -16, use_basemap), "presentation-prevention-map", 545)
+    with note_col:
+        st.markdown(
+            '<div class="sr-alert sr-good"><div class="sr-title">Preventive condition — not an accident</div>'
+            '<div class="sr-body">Forecast heavy rain, road wetness and rising congestion increase operational risk. '
+            'SkyRoute can recommend inspection, speed control, vehicle restriction or a preventive corridor change before a hazardous-material crash occurs.</div></div>',
+            unsafe_allow_html=True,
+        )
+        for label, value, detail in [
+            ("Rain forecast", f"{rain_mm_h} mm/h", "preventive environmental signal"),
+            ("Road wetness", f"{road_wetness:.0%}", "reduced braking reliability"),
+            ("Traffic index", f"{traffic_index:.1f}/10", "delay and collision pressure"),
+            ("Preventive risk", f"{prevention_value}/100", prevention_level),
+        ]:
+            st.markdown(
+                f'<div class="sr-panel"><div class="sr-small">{label}</div>'
+                f'<div class="sr-title">{value}</div><div class="sr-body">{detail}</div></div>',
+                unsafe_allow_html=True,
+            )
+
+
+def render_presentation_population() -> None:
+    hour_options = [2, 8, 14, 19]
+    selected_hour = st.select_slider(
+        "Scenario time",
+        options=hour_options,
+        value=int(st.session_state.get("presentation_hour", 14)),
+        format_func=lambda value: f"{value:02d}:00",
+        key="presentation_hour",
+    )
+    dynamic_pois = build_live_pois(int(selected_hour), True)
+    school_people = sum(item["population_now"] for item in dynamic_pois if item.get("type") == "school")
+    residential_people = sum(item["population_now"] for item in dynamic_pois if item.get("type") in {"residential", "village"})
+    priority = "School community" if 7 <= selected_hour <= 17 and school_people > 0 else "Residential communities"
+    map_col, metric_col = st.columns([1.55, 1])
+    with map_col:
+        layers = presentation_context_layers("presentation-population", include_incident=True)
+        population_points = []
+        for item in dynamic_pois:
+            mapped = dict(item)
+            mapped["population_radius"] = int(clamp(120 + math.sqrt(max(1, item["population_now"])) * 22, 150, 1250))
+            population_points.append(mapped)
+        layers.append(scatter_layer("presentation-dynamic-buffers", population_points, "population_radius", "buffer_color"))
+        layers += point_layers("presentation-dynamic-pois", dynamic_pois, 54, 19)
+        render_map(make_deck(layers, active.lat, active.lon, 12.65, 45, -18, use_basemap), "presentation-population-map", 545)
+    with metric_col:
+        st.markdown(
+            f'<div class="sr-panel selected"><div class="sr-small">PRIMARY PROTECTION TARGET · {selected_hour:02d}:00</div>'
+            f'<div class="sr-title">{priority}</div><div class="sr-body">Priority changes with estimated presence, vulnerability and incident geometry.</div></div>',
+            unsafe_allow_html=True,
+        )
+        c1, c2 = st.columns(2)
+        c1.metric("School occupancy", f"{school_people:,}", "dynamic estimate")
+        c2.metric("Residential presence", f"{residential_people:,}", "dynamic estimate")
+        if school_people == 0:
+            st.markdown(
+                '<div class="sr-presentation-impact">At night, the school is not treated as occupied. Residential communities move up the protection ranking.</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                '<div class="sr-presentation-impact">During school hours, children and staff materially change the exposure calculation.</div>',
+                unsafe_allow_html=True,
+            )
+        st.caption("Scenario estimate for demonstration. Production deployment requires authorized occupancy, census and mobility feeds.")
+
+
+def render_presentation_route_comparison() -> None:
+    resource, options = presentation_route_options()
+    fastest = options.get("fastest")
+    safest = options.get("safest")
+    map_col, compare_col = st.columns([1.52, 1])
+    with map_col:
+        layers = presentation_context_layers("presentation-routes", include_incident=True)
+        layers += vulnerability_buffer_layers("presentation-routes")
+        if resource:
+            layers += point_layers("presentation-route-resource", [{
+                "id": resource.id,
+                "lon": resource.lon,
+                "lat": resource.lat,
+                "kind": resource.kind,
+                "status": resource.status,
+                "color": AGENCY_COLOR["hazmat"] + [245],
+                "title": resource.name,
+                "details": "HazMat origin used in the route comparison.",
+            }], 62, 20)
+        path_objects = []
+        for route_key, route, color, label in [
+            ("fastest", fastest, [0, 217, 255, 240], "Fastest route"),
+            ("safest", safest, [0, 230, 160, 245], "Safer route"),
+        ]:
+            if route and len(route.path) >= 2:
+                path_objects.append({
+                    "path": route.path,
+                    "color": color,
+                    "width": 9 if route_key == "safest" else 7,
+                    "title": label,
+                    "details": f"ETA {route.eta_min} min · exposure score {route.exposure_score} · {route.backend}",
+                })
+        if path_objects:
+            layers += path_layers_with_halo("presentation-route-comparison", path_objects, 8, halo_extra=5)
+            combined_path = [point for item in path_objects for point in item["path"]]
+            center_lat, center_lon, zoom = path_view(combined_path)
+        else:
+            center_lat, center_lon, zoom = active.lat, active.lon, 12.25
+        render_map(make_deck(layers, center_lat, center_lon, zoom, 47, -20, use_basemap), "presentation-route-map", 575)
+    with compare_col:
+        fastest_eta = fastest.eta_min if fastest and fastest.eta_min else 18
+        # The comparison card uses the controlled pitch scenario. The map
+        # tooltip still exposes the live route-engine ETA and provenance.
+        safer_eta = fastest_eta + 4
+        st.markdown(
+            f'<div class="sr-route-compare">'
+            f'<div class="sr-route-choice fast"><div class="name">Fastest route</div><div class="value">{fastest_eta:.0f} min</div>'
+            f'<div class="meta">4,850 people near route<br/>1,170 vulnerable people<br/>2 schools affected<br/>Recommendation: rejected</div></div>'
+            f'<div class="sr-route-choice safe"><div class="name">Safer route</div><div class="value">{safer_eta:.0f} min</div>'
+            f'<div class="meta">1,420 people near route<br/>260 vulnerable people<br/>0 schools affected<br/>Recommendation: selected</div></div>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="sr-presentation-impact">+4 minutes · −78% potential vulnerable exposure</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="sr-data-note">These are internally consistent scenario estimates for the pitch. '
+            'They express potential exposure reduction, not a claim of predicted lives saved.</div>',
+            unsafe_allow_html=True,
+        )
+        if not path_objects:
+            st.warning("The route service is unavailable. SkyRoute intentionally does not draw a cross-block approximation.")
+
+
+def render_presentation_replanning() -> None:
+    stage_labels = ["Initial incident", "Heavy rain", "Secondary road crash", "Wind shift"]
+    current_stage = st.session_state.get("presentation_replan_stage", stage_labels[0])
+    if current_stage not in stage_labels:
+        current_stage = stage_labels[0]
+        st.session_state.presentation_replan_stage = current_stage
+    stage = st.radio(
+        "Scenario update",
+        stage_labels,
+        index=stage_labels.index(current_stage),
+        horizontal=True,
+        key="presentation_replan_stage",
+    )
+    stage_index = stage_labels.index(stage) if isinstance(stage, str) else int(stage)
+    resource, options = presentation_route_options()
+    fastest, safest = options.get("fastest"), options.get("safest")
+    map_col, trace_col = st.columns([1.52, 1])
+    with map_col:
+        layers = presentation_context_layers("presentation-replan", include_incident=True)
+        if fastest and fastest.path:
+            layers += path_layers_with_halo("presentation-replan-old", [{
+                "path": fastest.path,
+                "color": [255, 89, 94, 170 if stage_index >= 2 else 235],
+                "width": 7,
+                "title": "Original fastest corridor",
+                "details": "Becomes unreliable after the secondary crash." if stage_index >= 2 else "Initial fastest alternative.",
+            }], 7, halo_extra=4)
+        if stage_index >= 1:
+            wet_segments = [{**item, "color": [255, 209, 102, 180], "width": 9} for item in traffic_path_data()[:3]]
+            if wet_segments:
+                layers.append(path_layer("presentation-replan-rain", wet_segments, 9))
+        if stage_index >= 2 and fastest and len(fastest.path) >= 2:
+            crash_point = fastest.path[len(fastest.path) // 2]
+            layers += point_layers("presentation-secondary-crash", [{
+                "id": "SECONDARY-CRASH",
+                "lon": crash_point[0],
+                "lat": crash_point[1],
+                "type": "traffic_incident",
+                "color": [255, 89, 94, 245],
+                "title": "Secondary road crash",
+                "details": "Fastest response corridor partially blocked. Recalculation initiated.",
+            }], 72, 21)
+        if stage_index >= 2 and safest and safest.path:
+            layers += path_layers_with_halo("presentation-replan-new", [{
+                "path": safest.path,
+                "color": [0, 230, 160, 245],
+                "width": 9,
+                "title": "Updated safer route",
+                "details": "Selected after the new road and exposure constraints.",
+            }], 9, halo_extra=5)
+        render_map(make_deck(layers, active.lat, active.lon, 12.35, 47, -20, use_basemap), "presentation-replan-map", 555)
+    with trace_col:
+        events = [
+            ("14:00", "Initial incident interpreted"),
+            ("14:04", "Heavy rain reduces road reliability"),
+            ("14:07", "Secondary road crash blocks the fastest corridor"),
+            ("14:09", "Wind shift moves the exposure zone"),
+            ("14:10", "Updated safer route prepared for human approval"),
+        ]
+        visible_count = [1, 2, 4, 5][stage_index]
+        rows = "".join(
+            f'<div class="sr-agent-trace-row"><span>{time_label}</span><span>{message}</span></div>'
+            for time_label, message in events[:visible_count]
+        )
+        st.markdown(f'<div class="sr-agent-trace">{rows}</div>', unsafe_allow_html=True)
+        if stage_index == 0:
+            st.info("The first recommendation is valid for the initial conditions.")
+        elif stage_index == 1:
+            st.warning("Rain is now an incident condition: it affects access, response time and plume assumptions.")
+        elif stage_index == 2:
+            st.error("Fastest corridor rejected. A new road-following alternative is required.")
+        else:
+            st.success("Updated route and protection priorities are ready for commander review.")
+
+
+def render_presentation_agent() -> None:
+    left, right = st.columns([1.2, 1])
+    with left:
+        trace = [
+            "Interpret incident report and current conditions",
+            "Call weather and chemical-risk tools",
+            "Estimate dynamic population for the event time",
+            "Rank vulnerable settings and environmental receptors",
+            "Calculate road-following candidate routes",
+            "Compare time, exposure, congestion and responder risk",
+            "Explain recommendation and record provenance",
+            "Wait for commander approval",
+        ]
+        rows = "".join(
+            f'<div class="sr-agent-trace-row"><span>{index:02d}</span><span>{message}</span></div>'
+            for index, message in enumerate(trace, 1)
+        )
+        st.markdown(f'<div class="sr-agent-trace">{rows}</div>', unsafe_allow_html=True)
+    with right:
+        st.markdown(
+            '<div class="sr-panel selected"><div class="sr-small">CURRENT RECOMMENDATION</div>'
+            '<div class="sr-title">Use the lower-exposure HazMat access route</div>'
+            '<div class="sr-body">The recommendation balances ETA, vulnerable population, traffic reliability, environmental sensitivity and responder safety.</div></div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(
+            '<div class="sr-alert sr-good"><div class="sr-title">Human command authority</div>'
+            '<div class="sr-body">SkyRoute may recommend, prepare and re-evaluate. It does not autonomously dispatch emergency resources.</div></div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("Open the operational agent", type="primary", use_container_width=True, key="presentation-open-agent"):
+            open_agent()
+
+
+def page_presentation() -> None:
+    step_index = int(clamp(st.session_state.get("presentation_step", 0), 0, len(PRESENTATION_STEPS) - 1))
+    st.session_state.presentation_step = step_index
+    step = PRESENTATION_STEPS[step_index]
+
+    nav_exit, nav_progress, nav_previous, nav_next = st.columns([1.05, 4.2, 0.82, 0.82], vertical_alignment="center")
+    with nav_exit:
+        if st.button("← Exit", key="presentation-exit", use_container_width=True):
+            exit_presentation()
+    with nav_progress:
+        st.progress((step_index + 1) / len(PRESENTATION_STEPS), text=f"{step_index + 1} / {len(PRESENTATION_STEPS)}")
+    with nav_previous:
+        if st.button("‹ Previous", key="presentation-previous", use_container_width=True, disabled=step_index == 0):
+            st.session_state.presentation_step = max(0, step_index - 1)
+            st.rerun()
+    with nav_next:
+        if st.button("Next ›", key="presentation-next", type="primary", use_container_width=True, disabled=step_index == len(PRESENTATION_STEPS) - 1):
+            st.session_state.presentation_step = min(len(PRESENTATION_STEPS) - 1, step_index + 1)
+            st.rerun()
+
+    st.markdown(
+        f'<div class="sr-presentation-shell"><div class="sr-presentation-kicker">{step["kicker"]}</div>'
+        f'<div class="sr-presentation-title">{step["title"]}</div>'
+        f'<div class="sr-presentation-copy">{step["copy"]}</div>'
+        f'<div class="sr-presentation-impact">{step["impact"]}</div></div>',
+        unsafe_allow_html=True,
+    )
+    presentation_module_grid(step["modules"])
+
+    renderers = [
+        render_presentation_prevention,
+        render_presentation_population,
+        render_presentation_route_comparison,
+        render_presentation_replanning,
+        render_presentation_agent,
+    ]
+    renderers[step_index]()
+
+
+# =============================================================================
 # PAGE 9 — CASES AND DATA
 # =============================================================================
 def page_cases() -> None:
@@ -5859,6 +6495,8 @@ def page_cases() -> None:
         ("Traffic", "Time-stamped operational simulation; production connector designed for authorized traffic feeds.", "Simulated live", "sim"),
         ("Population", "Routine-activity and sensitive-target estimates recalculated for the active incident time.", "Dynamic estimate", "sim"),
         ("Environment", "Water receptors, protected areas and incident-specific environmental protection targets.", "Public + scenario", ""),
+        ("Land use", "OpenStreetMap land-use polygons shown as contextual public geography.", "Public context", "visual"),
+        ("Building footprints", "Flat OpenStreetMap outlines. No 3D height, occupancy or structural condition is inferred, and they do not affect routes or risk.", "Visual only", "visual"),
         ("Weather", "Operational scenario values structured for replacement by CMA, sensors or customer feeds.", "Simulated live", "sim"),
     ]
     cards = []
@@ -6008,6 +6646,7 @@ PAGE_FUNCTIONS = {
     "Incident Command": page_incident_command,
     "SkyRoute AI Copilot": page_agent,
     "Cases & Data": page_cases,
+    "Presentation": page_presentation,
 }
 
 PAGE_FUNCTIONS.get(page, page_central)()
@@ -6015,7 +6654,7 @@ PAGE_FUNCTIONS.get(page, page_central)()
 st.markdown(
     """
 <div class="sr-footer">
-SkyRoute / 天途 v14 · live vulnerability-aware emergency decision demonstrator.<br/>
+SkyRoute / 天途 v25 · live vulnerability-aware emergency decision demonstrator.<br/>
 Default positions, traffic, population estimates, plume geometry, hospital capacity and response scores are simulation inputs. The Huai'an 2005 scenario is presented as a live incident simulation based on a real event; operational map anchors and changing weather inputs remain modeling assumptions. No real dispatch is performed.<br/>
 Production deployment requires official emergency plans, validated vulnerability and dispersion models, licensed data, secure platform integration and final human command authority.
 </div>
