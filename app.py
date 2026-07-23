@@ -2733,30 +2733,30 @@ def text_layer(
         "TextLayer",
         id=layer_id,
         data=prepared,
-        get_position="[lon, lat]",
+        get_position="[lon, lat, 7]",
         get_text="glyph",
         get_size=size,
         size_units="pixels",
         size_min_pixels=max(12, size - 4),
         size_max_pixels=size + 6,
         get_color=[3, 8, 14, 245] if shadow else "text_color",
-        get_pixel_offset=[1, 1] if shadow else [0, 0],
+        get_pixel_offset=[1, -3] if shadow else [0, -4],
         get_alignment_baseline="'center'",
         get_text_anchor="'middle'",
         font_family="Arial",
         character_set=list("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+!OX-"),
-        billboard=False,
+        billboard=True,
         parameters={"depthTest": False},
         pickable=False,
     )
 
 
 def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65, size: int = 18) -> List[pdk.Layer]:
-    """Render operational points with compact universal neon icons when available.
+    """Render compact operational markers slightly above the map surface.
 
-    The ScatterplotLayer remains the pickable/status halo. Supported agencies and facilities receive a reliable embedded PNG IconLayer
-    using internationally recognizable pictograms; other map objects retain
-    lightweight map-plane text symbols.
+    The status halo remains attached to the geographic point. PNG symbols are
+    billboarded toward the camera, lifted a few metres above the map and bottom-
+    anchored so they remain legible at an angled view without looking detached.
     """
     prepared = _prepare_point_data(data)
     icon_items: List[Dict[str, Any]] = []
@@ -2767,7 +2767,11 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
         icon_key = str(item.get("symbol_key", ""))
         if icon_key in MAP_ICON_MAPPINGS:
             item["icon_data"] = dict(MAP_ICON_MAPPINGS[icon_key])
+            # Anchor the lower part of the badge to the location and lift it just
+            # enough to prevent the pitched basemap from visually clipping it.
+            item["icon_data"]["anchorY"] = 54
             item["icon_size_px"] = icon_pixels
+            item["icon_elevation_m"] = 8
             item["fallback_glyph"] = str(item.get("glyph", "O"))[:1]
             icon_items.append(item)
         else:
@@ -2781,12 +2785,13 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
             data=icon_items,
             icon_mapping=None,
             get_icon="icon_data",
-            get_position="[lon, lat]",
+            get_position="[lon, lat, icon_elevation_m]",
             get_size="icon_size_px",
             size_units="pixels",
             size_min_pixels=16,
             size_max_pixels=22,
-            billboard=False,
+            get_pixel_offset=[0, -2],
+            billboard=True,
             parameters={"depthTest": False},
             pickable=True,
             auto_highlight=True,
@@ -2806,12 +2811,14 @@ def incident_icon_layers(
     get_size: int = 4,
     size_scale: int = 13,
 ) -> List[pdk.Layer]:
-    """Render a compact neon incident symbol in the geographic map plane."""
+    """Render the incident badge upright and slightly above the map surface."""
     incidents_with_icon: List[Dict[str, Any]] = []
     for raw in data:
         item = dict(raw)
         item["icon_data"] = dict(ALERT_ICON_MAPPING)
+        item["icon_data"]["anchorY"] = 55
         item["icon_size_px"] = 21
+        item["icon_elevation_m"] = 10
         item["fallback_glyph"] = "!"
         item.setdefault("title", item.get("name", "Incident"))
         item.setdefault("details", item.get("description", "Active incident"))
@@ -2822,12 +2829,13 @@ def incident_icon_layers(
         data=incidents_with_icon,
         icon_mapping=None,
         get_icon="icon_data",
-        get_position="[lon, lat]",
+        get_position="[lon, lat, icon_elevation_m]",
         get_size="icon_size_px",
         size_units="pixels",
         size_min_pixels=19,
         size_max_pixels=23,
-        billboard=False,
+        get_pixel_offset=[0, -3],
+        billboard=True,
         parameters={"depthTest": False},
         pickable=True,
         auto_highlight=True,
