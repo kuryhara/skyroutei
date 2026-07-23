@@ -1,5 +1,5 @@
 """
-SkyRoute / 天途 v20 — 3D Layer Controls and Clean Data Workspace
+SkyRoute / 天途 v21 — Compact Layer Toolbar and Flat Map Icons
 ==================================================================
 Single-file Streamlit application for a demonstrator of hazardous-material
 incident prevention, command, routing, dispatch, population protection,
@@ -256,15 +256,20 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 @media(max-width:1000px){{.sr-workflow{{position:relative;top:auto}}.sr-brand-lockup{{gap:10px}}.sr-brand-icon{{height:44px}}.sr-brand-wordmark{{font-size:30px;letter-spacing:.10em}}.sr-sidebar-brand .sr-brand-wordmark{{font-size:24px;}}}}
 
 
-.sr-layer-shell{{border:1px solid rgba(0,229,255,.16);border-radius:13px;background:linear-gradient(180deg,rgba(6,18,29,.94),rgba(4,12,20,.96));padding:10px 12px 5px;margin:8px 0 10px;box-shadow:0 10px 28px rgba(0,0,0,.18);}}
-.sr-layer-head{{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:2px;}}
-.sr-layer-title{{display:flex;align-items:center;gap:7px;font:700 11px 'Poppins';color:#F2F6E8;}}
-.sr-layer-title:before{{content:'◫';font:700 15px 'JetBrains Mono';color:#00E5FF;text-shadow:0 0 10px rgba(0,229,255,.55);}}
-.sr-layer-help{{font:8.5px 'JetBrains Mono';color:#91A87A;}}
-[data-testid="stToggle"]{{margin-top:-2px;margin-bottom:2px;}}
-[data-testid="stToggle"] label{{font:9px 'JetBrains Mono'!important;color:#D6E2C6!important;}}
-[data-testid="stToggle"] [data-baseweb="checkbox"]{{transform:scale(.88);transform-origin:left center;}}
-.sr-data-grid{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:7px 0 12px;}}
+/* Compact map-layer pill bar */
+[class*="st-key-layer_toolbar_"]{{border:1px solid rgba(0,229,255,.16);border-radius:10px;background:rgba(4,13,20,.78);padding:4px 6px;margin:5px 0 9px;box-shadow:0 8px 22px rgba(0,0,0,.14);}}
+[class*="st-key-layer_toolbar_"] [data-testid="stHorizontalBlock"]{{gap:.34rem!important;align-items:center;}}
+[class*="st-key-layer_toolbar_"] [data-testid="column"]{{padding:0!important;}}
+.sr-layer-inline-label{{height:28px;display:flex;align-items:center;gap:6px;padding:0 5px;color:#BFD2DF;font:700 9px 'Poppins';white-space:nowrap;}}
+.sr-layer-inline-label svg{{width:14px;height:14px;stroke:#00E5FF;filter:drop-shadow(0 0 5px rgba(0,229,255,.4));}}
+[class*="st-key-layer_toolbar_"] [data-testid="stButton"]{{margin:0!important;}}
+[class*="st-key-layer_toolbar_"] [data-testid="stButton"] button{{min-height:28px!important;height:28px!important;padding:0 9px!important;border-radius:7px!important;font:700 8.5px 'JetBrains Mono'!important;text-transform:lowercase!important;line-height:1!important;box-shadow:none!important;white-space:nowrap!important;}}
+[class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-secondary"]{{background:transparent!important;border:1px solid rgba(148,163,184,.18)!important;color:#91A87A!important;}}
+[class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-secondary"]:hover{{border-color:rgba(0,229,255,.42)!important;color:#D6EAF2!important;background:rgba(0,229,255,.04)!important;}}
+[class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-primary"]{{background:rgba(0,229,255,.11)!important;border:1px solid rgba(0,229,255,.62)!important;color:#E9FCFF!important;box-shadow:inset 0 0 0 1px rgba(0,229,255,.04),0 0 10px rgba(0,229,255,.08)!important;}}
+[class*="st-key-layer_toolbar_"] [data-testid="stBaseButton-primary"]:hover{{background:rgba(0,229,255,.17)!important;border-color:#00E5FF!important;}}
+@media(max-width:900px){{[class*="st-key-layer_toolbar_"] [data-testid="stHorizontalBlock"]{{gap:.2rem!important;}}[class*="st-key-layer_toolbar_"] [data-testid="stButton"] button{{padding:0 6px!important;font-size:7.8px!important;}}.sr-layer-inline-label{{font-size:8px;gap:4px;}}}}
+.sr-data-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px;margin:7px 0 12px;}}
 .sr-data-card{{border:1px solid #405334;border-radius:11px;background:linear-gradient(180deg,rgba(8,24,42,.92),rgba(5,15,28,.95));padding:12px;min-height:112px;}}
 .sr-data-card .eyebrow{{font:8px 'JetBrains Mono';letter-spacing:.08em;text-transform:uppercase;color:#91A87A;}}
 .sr-data-card .name{{font:700 12px 'Poppins';color:#F2F6E8;margin-top:5px;}}
@@ -2521,7 +2526,7 @@ def init_state() -> None:
         "nav_page": "Central & Prevention",
         "agent_return_page": "Central & Prevention",
         "agent_return_incident_tab": "Overview",
-        "show_3d_buildings": True,
+        "show_3d_buildings": False,
         "show_worldpop_3d": False,
         "layer_population": True,
         "layer_environment": True,
@@ -2740,7 +2745,8 @@ def text_layer(
         get_text_anchor="'middle'",
         font_family="Arial",
         character_set=list("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+!OX-"),
-        billboard=True,
+        billboard=False,
+        parameters={"depthTest": False},
         pickable=False,
     )
 
@@ -2749,13 +2755,13 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
     """Render operational points with compact universal neon icons when available.
 
     The ScatterplotLayer remains the pickable/status halo. Supported agencies and facilities receive a reliable embedded PNG IconLayer
-    using internationally recognizable pictograms; all other map objects retain
-    the lightweight ASCII fallback.
+    using internationally recognizable pictograms; other map objects retain
+    lightweight map-plane text symbols.
     """
     prepared = _prepare_point_data(data)
     icon_items: List[Dict[str, Any]] = []
     text_items: List[Dict[str, Any]] = []
-    icon_pixels = int(clamp(size + 2, 18, 23))
+    icon_pixels = int(clamp(size, 17, 21))
     for raw in prepared:
         item = dict(raw)
         icon_key = str(item.get("symbol_key", ""))
@@ -2769,26 +2775,6 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
 
     layers: List[pdk.Layer] = [scatter_layer(f"{layer_prefix}-points", prepared, radius)]
     if icon_items:
-        # ASCII fallback is placed under the PNG and remains visible if a
-        # browser ever fails to decode the texture.
-        layers.append(pdk.Layer(
-            "TextLayer",
-            id=f"{layer_prefix}-icon-fallback",
-            data=icon_items,
-            get_position="[lon, lat]",
-            get_text="fallback_glyph",
-            get_size=10,
-            size_units="pixels",
-            size_min_pixels=9,
-            size_max_pixels=12,
-            get_color=[255, 255, 255, 255],
-            get_alignment_baseline="'center'",
-            get_text_anchor="'middle'",
-            font_family="Arial",
-            character_set=list("PFAHEBSKR+CT"),
-            billboard=True,
-            pickable=False,
-        ))
         layers.append(pdk.Layer(
             "IconLayer",
             id=f"{layer_prefix}-icons",
@@ -2798,9 +2784,10 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
             get_position="[lon, lat]",
             get_size="icon_size_px",
             size_units="pixels",
-            size_min_pixels=18,
-            size_max_pixels=24,
-            billboard=True,
+            size_min_pixels=16,
+            size_max_pixels=22,
+            billboard=False,
+            parameters={"depthTest": False},
             pickable=True,
             auto_highlight=True,
             highlight_color=[255, 255, 255, 95],
@@ -2819,35 +2806,16 @@ def incident_icon_layers(
     get_size: int = 4,
     size_scale: int = 13,
 ) -> List[pdk.Layer]:
-    """Render a compact neon incident symbol with an ASCII fallback."""
+    """Render a compact neon incident symbol in the geographic map plane."""
     incidents_with_icon: List[Dict[str, Any]] = []
     for raw in data:
         item = dict(raw)
         item["icon_data"] = dict(ALERT_ICON_MAPPING)
-        item["icon_size_px"] = 24
+        item["icon_size_px"] = 21
         item["fallback_glyph"] = "!"
         item.setdefault("title", item.get("name", "Incident"))
         item.setdefault("details", item.get("description", "Active incident"))
         incidents_with_icon.append(item)
-
-    fallback_layer = pdk.Layer(
-        "TextLayer",
-        id=f"{layer_prefix}-fallback",
-        data=incidents_with_icon,
-        get_position="[lon, lat]",
-        get_text="fallback_glyph",
-        get_size=11,
-        size_units="pixels",
-        size_min_pixels=10,
-        size_max_pixels=13,
-        get_color=[255, 255, 255, 255],
-        get_alignment_baseline="'center'",
-        get_text_anchor="'middle'",
-        font_family="Arial",
-        character_set=list("!"),
-        billboard=True,
-        pickable=False,
-    )
     icon_layer = pdk.Layer(
         "IconLayer",
         id=f"{layer_prefix}-points",
@@ -2857,14 +2825,15 @@ def incident_icon_layers(
         get_position="[lon, lat]",
         get_size="icon_size_px",
         size_units="pixels",
-        size_min_pixels=22,
-        size_max_pixels=26,
-        billboard=True,
+        size_min_pixels=19,
+        size_max_pixels=23,
+        billboard=False,
+        parameters={"depthTest": False},
         pickable=True,
         auto_highlight=True,
         highlight_color=[255, 255, 255, 95],
     )
-    return [fallback_layer, icon_layer]
+    return [icon_layer]
 
 
 def path_layer(layer_id: str, data: List[Dict[str, Any]], width: int = 7, color: Any = "color", pickable: bool = True) -> pdk.Layer:
@@ -3291,25 +3260,8 @@ def illustrative_building_data() -> List[Dict[str, Any]]:
 
 
 def illustrative_buildings_layer(prefix: str) -> Optional[pdk.Layer]:
-    if not show_3d_buildings:
-        return None
-    data = illustrative_building_data()
-    if not data:
-        return None
-    return pdk.Layer(
-        "PolygonLayer",
-        id=f"{prefix}-buildings-3d",
-        data=data,
-        get_polygon="polygon",
-        get_fill_color="color",
-        get_elevation="height",
-        extruded=True,
-        wireframe=False,
-        get_line_color=[130, 174, 190, 70],
-        line_width_min_pixels=1,
-        pickable=True,
-        opacity=0.52,
-    )
+    """3D building massing was removed from the operational map."""
+    return None
 
 
 def _nearest_traffic_roadblock_points() -> List[Dict[str, Any]]:
@@ -3624,7 +3576,7 @@ show_traffic_layer = bool(st.session_state.get("layer_traffic_routes", True))
 show_water_layer = bool(st.session_state.get("layer_environment", True))
 show_environment_layer = bool(st.session_state.get("layer_environment", True))
 show_labels_layer = True
-show_3d_buildings = bool(st.session_state.get("show_3d_buildings", True))
+show_3d_buildings = False
 show_worldpop_3d = False
 
 # Stable scenario inputs used by the prevention and live-incident models.
@@ -4285,37 +4237,51 @@ def render_selected_decision_strip() -> None:
 
 
 def render_map_layer_controls(scope: str) -> None:
-    """Render compact persistent map-layer switches."""
+    """Render a small pill-style map-layer toolbar."""
     global show_population_layer, show_environment_layer, show_water_layer
     global show_resources_layer, show_routes_layer, show_traffic_layer
     global show_3d_buildings
 
-    st.markdown(
-        '<div class="sr-layer-shell"><div class="sr-layer-head">'
-        '<div class="sr-layer-title">Map layers</div>'
-        '<div class="sr-layer-help">Right-drag to rotate · scroll to zoom · hover for details</div>'
-        '</div></div>',
-        unsafe_allow_html=True,
-    )
-    c1, c2, c3, c4, c5 = st.columns(5)
-    with c1:
-        st.toggle("Population", key="layer_population", help="Vulnerable population targets and exposure buffers")
-    with c2:
-        st.toggle("Environment", key="layer_environment", help="Water, protected areas and environmental receptors")
-    with c3:
-        st.toggle("3D buildings", key="show_3d_buildings", help="Illustrative urban context; not used in route or risk calculations")
-    with c4:
-        st.toggle("Resources", key="layer_resources", help="Police, fire, HazMat, EMS and support resources")
-    with c5:
-        st.toggle("Traffic & routes", key="layer_traffic_routes", help="Traffic state, corridors and operational routes")
+    layer_specs = [
+        ("population", "layer_population", "Vulnerable population targets and exposure buffers"),
+        ("environment", "layer_environment", "Water, protected areas and environmental receptors"),
+        ("resources", "layer_resources", "Police, fire, HazMat, EMS and support resources"),
+        ("routes", "layer_traffic_routes", "Traffic state, corridors and operational routes"),
+    ]
 
-    show_population_layer = bool(st.session_state.layer_population)
-    show_environment_layer = bool(st.session_state.layer_environment)
+    with st.container(key=f"layer_toolbar_{scope}"):
+        columns = st.columns([0.78, 1.12, 1.22, 1.03, 0.96], gap="small", vertical_alignment="center")
+        with columns[0]:
+            st.markdown(
+                '<div class="sr-layer-inline-label" title="Map layers">'
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+                '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path>'
+                '<path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path>'
+                '<path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path>'
+                '</svg><span>Layers</span></div>',
+                unsafe_allow_html=True,
+            )
+
+        for column, (label, state_key, help_text) in zip(columns[1:], layer_specs):
+            is_active = bool(st.session_state.get(state_key, True))
+            with column:
+                if st.button(
+                    label,
+                    key=f"{scope}_{state_key}_pill",
+                    type="primary" if is_active else "secondary",
+                    help=help_text,
+                    use_container_width=True,
+                ):
+                    st.session_state[state_key] = not is_active
+                    st.rerun()
+
+    show_population_layer = bool(st.session_state.get("layer_population", True))
+    show_environment_layer = bool(st.session_state.get("layer_environment", True))
     show_water_layer = show_environment_layer
-    show_3d_buildings = bool(st.session_state.show_3d_buildings)
-    show_resources_layer = bool(st.session_state.layer_resources)
-    show_routes_layer = bool(st.session_state.layer_traffic_routes)
+    show_resources_layer = bool(st.session_state.get("layer_resources", True))
+    show_routes_layer = bool(st.session_state.get("layer_traffic_routes", True))
     show_traffic_layer = show_routes_layer
+    show_3d_buildings = False
 
 
 # =============================================================================
@@ -4555,7 +4521,7 @@ def page_incident_overview() -> None:
             "details": f"Leak estimate: {incident_state['dynamic_leak']:.0f} kg/min<br/>{active.description}",
         }], get_size=4, size_scale=13)
 
-        pitch = 54 if show_3d_buildings else 42
+        pitch = 46
         deck = make_deck(layers, active.lat, active.lon, 13.05, pitch, -22, use_basemap)
         render_map(deck, "incident-overview-map", 650)
         legend = [
@@ -5864,9 +5830,9 @@ def page_agent() -> None:
 def page_cases() -> None:
     st.markdown('<div class="sr-h2">Cases & data</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="sr-data-note"><b>Read the prototype in three layers:</b> '
-        'connected street geometry, dynamic operational estimates, and visual-only context. '
-        'Illustrative 3D buildings never affect routing, exposure or risk scores.</div>',
+        '<div class="sr-data-note"><b>Read the prototype by data status:</b> '
+        'connected street geometry and dynamic operational estimates. '
+        'Each layer is identified by source and operational status.</div>',
         unsafe_allow_html=True,
     )
 
@@ -5876,7 +5842,6 @@ def page_cases() -> None:
         ("Population", "Routine-activity and sensitive-target estimates recalculated for the active incident time.", "Dynamic estimate", "sim"),
         ("Environment", "Water receptors, protected areas and incident-specific environmental protection targets.", "Public + scenario", ""),
         ("Weather", "Operational scenario values structured for replacement by CMA, sensors or customer feeds.", "Simulated live", "sim"),
-        ("3D buildings", "Deterministic illustrative massing used only to improve spatial orientation on the map.", "Visual only", "visual"),
     ]
     cards = []
     for name, source, status, css in data_layers:
