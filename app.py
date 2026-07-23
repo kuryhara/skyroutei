@@ -3521,7 +3521,7 @@ preventive_alerts = build_preventive_alerts(
 st.markdown(
     f"""
 <div class="sr-top">
- <div class="sr-brand">{skyroute_logo_html()}<div><div class="sr-sub">{"Huai’an live chlorine response simulation" if active.id == HISTORICAL_INCIDENT_ID else "Interactive prevention, routing and incident command · Nanjing pilot"}</div></div></div>
+ <div class="sr-brand">{skyroute_logo_html()}<div><div class="sr-sub">{"Huai’an live chlorine response simulation" if active.id == HISTORICAL_INCIDENT_ID else "Global emergency prevention, routing and incident command"}</div></div></div>
  <div class="sr-topstats">
   <div class="sr-topstat">Workspace<b>{page}</b></div>
   <div class="sr-topstat">Incident<b>{active.id}</b></div>
@@ -4317,7 +4317,7 @@ def page_incident_overview() -> None:
             "details": f"Leak estimate: {incident_state['dynamic_leak']:.0f} kg/min<br/>{active.description}",
         }], 100, 22)
 
-        pitch = 0
+        pitch = 42
         deck = make_deck(layers, active.lat, active.lon, 13.05, pitch, -12, use_basemap)
         render_map(deck, "incident-overview-map", 650)
         legend = [
@@ -4472,7 +4472,7 @@ def page_population() -> None:
             "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
         }], 92, 22)
-        pitch = 0
+        pitch = 34
         render_map(make_deck(layers, active.lat, active.lon, 12.45, pitch, -8, use_basemap), "population-protection-map", 680)
         population_legend: List[Tuple[str, str, str]] = [
             (MAP_SYMBOL_GLYPH["incident"], "Accident source", "#FF595E"),
@@ -4641,7 +4641,7 @@ def page_dispatch() -> None:
 
         center_lat = (selected_resource.lat + selected_target["lat"]) / 2
         center_lon = (selected_resource.lon + selected_target["lon"]) / 2
-        dispatch_pitch = 0
+        dispatch_pitch = 38
         render_map(make_deck(layers, center_lat, center_lon, 12.35, dispatch_pitch, -8, use_basemap), "dispatch-resources-map", 690)
         render_map_legend([
             (AGENCY_GLYPH[agency], f"{AGENCY_LABEL[agency]} origin / active unit", "#%02X%02X%02X" % tuple(AGENCY_COLOR[agency])),
@@ -4969,7 +4969,7 @@ def page_plan() -> None:
     map_col, plan_col = st.columns([1.62, 1])
 
     with map_col:
-        pitch = 0
+        pitch = 40
         deck = make_deck(consolidated_map_layers(), active.lat, active.lon, 12.3, pitch, -10, use_basemap)
         render_map(deck, "consolidated-plan-map", 690)
         legend_items: List[Tuple[str, str, str]] = [
@@ -5468,7 +5468,7 @@ def page_historical_study() -> None:
             "title": "Accident source", "details": "Jinghu Expressway Huai'an section · liquid chlorine release",
         }], 105, 23)
 
-        pitch = 0
+        pitch = 40
         deck = make_deck(layers, active.lat, active.lon, 12.4, pitch, -10, use_basemap)
         render_map(deck, "live-case-map", 680)
         live_legend: List[Tuple[str, str, str]] = [
