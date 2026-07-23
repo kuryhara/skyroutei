@@ -88,3 +88,7 @@ The vector SkyRoute 天途 logo is stored in `assets/skyroute_tiantu_vector.svg`
 - Adds dark route halos and stronger emphasis for the AI-recommended route.
 - Enables optional 3D building massing and population/vulnerability volumes in incident command.
 - Map legends use the same geometric symbols, line swatches, and area swatches shown on maps.
+
+## Tactical map marker convention
+
+The flat operational map uses cloud-safe badge markers: `P` police, `F` fire, `H` HazMat, `A` EMS, `+` hospital, `B` evacuation bus, `E` environmental team, and `S` sensor. The map legend uses the same markers.

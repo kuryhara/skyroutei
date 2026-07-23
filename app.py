@@ -214,7 +214,8 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-top{{border-color:#768C45;background:linear-gradient(135deg,rgba(24,39,29,.97),rgba(6,17,14,.99));}}
 .sr-logo{{display:none;}}
 .sr-map-info-anchor{{position:relative;height:0;z-index:999;pointer-events:none;}}
-.sr-map-info-control{{position:absolute;right:14px;pointer-events:auto;}}
+.sr-map-native-info-mask{{position:absolute;right:0;width:48px;height:48px;background:#06110E;border-top-left-radius:12px;pointer-events:none;z-index:1;}}
+.sr-map-info-control{{position:absolute;right:12px;pointer-events:auto;z-index:2;}}
 .sr-map-info-control summary{{list-style:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:rgba(5,15,28,.96);border:1px solid #FFFFFF;color:#FFFFFF;font:700 14px 'Poppins';box-shadow:0 0 13px rgba(255,255,255,.22),0 0 20px rgba(0,229,255,.11);user-select:none;}}
 .sr-map-info-control summary::-webkit-details-marker{{display:none;}}
 .sr-map-info-control summary:hover{{border-color:#00E5FF;color:#00E5FF;box-shadow:0 0 16px rgba(0,229,255,.42);}}
@@ -389,35 +390,38 @@ AGENCY_LABEL = {
 }
 # Basic Unicode geometry is deliberately used instead of emoji. These symbols
 # render consistently in PyDeck TextLayer on local and Streamlit Cloud builds.
+# Short Latin badge labels are used on the map instead of emoji or rare
+# Unicode glyphs. They render consistently in local PyDeck and Streamlit Cloud.
+# The coloured marker identifies the agency; the white badge letter reinforces it.
 AGENCY_GLYPH = {
-    "police": "■",
-    "fire": "▲",
-    "ambulance": "✚",
-    "hazmat": "◆",
-    "environment": "○",
-    "bus": "▬",
-    "sensor": "◉",
+    "police": "P",
+    "fire": "F",
+    "ambulance": "A",
+    "hazmat": "H",
+    "environment": "E",
+    "bus": "B",
+    "sensor": "S",
 }
 MAP_SYMBOL_GLYPH = {
-    "incident": "★",
-    "community": "●",
-    "school": "◆",
-    "hospital": "✚",
-    "shelter": "◇",
-    "police": "■",
-    "fire": "▲",
-    "ambulance": "✚",
-    "hazmat": "◆",
-    "environment": "○",
-    "bus": "▬",
-    "sensor": "◉",
-    "roadblock": "✖",
-    "drain": "▼",
-    "truck": "▰",
-    "traffic_incident": "×",
-    "water": "◒",
-    "protected": "▱",
-    "target": "◎",
+    "incident": "!",
+    "community": "C",
+    "school": "K",
+    "hospital": "+",
+    "shelter": "R",
+    "police": "P",
+    "fire": "F",
+    "ambulance": "A",
+    "hazmat": "H",
+    "environment": "E",
+    "bus": "B",
+    "sensor": "S",
+    "roadblock": "X",
+    "drain": "D",
+    "truck": "T",
+    "traffic_incident": "X",
+    "water": "W",
+    "protected": "Z",
+    "target": "T",
 }
 
 
@@ -2457,8 +2461,8 @@ def init_state() -> None:
         "nav_page": "Central & Prevention",
         "agent_return_page": "Central & Prevention",
         "agent_return_incident_tab": "Overview",
-        "show_3d_buildings": True,
-        "show_worldpop_3d": True,
+        "show_3d_buildings": False,
+        "show_worldpop_3d": False,
         "active_incident_id": INCIDENTS[0].id,
         "selected_alert_id": None,
         "incident_tab": "Overview",
@@ -2649,7 +2653,12 @@ def scatter_layer(
     )
 
 
-def text_layer(layer_id: str, data: List[Dict[str, Any]], size: int = 18) -> pdk.Layer:
+def text_layer(
+    layer_id: str,
+    data: List[Dict[str, Any]],
+    size: int = 18,
+    shadow: bool = False,
+) -> pdk.Layer:
     prepared = _prepare_point_data(data)
     return pdk.Layer(
         "TextLayer",
@@ -2658,11 +2667,15 @@ def text_layer(layer_id: str, data: List[Dict[str, Any]], size: int = 18) -> pdk
         get_position="[lon, lat]",
         get_text="glyph",
         get_size=size,
-        get_color="text_color",
+        size_units="pixels",
+        size_min_pixels=max(12, size - 4),
+        size_max_pixels=size + 6,
+        get_color=[3, 8, 14, 245] if shadow else "text_color",
+        get_pixel_offset=[1, 1] if shadow else [0, 0],
         get_alignment_baseline="center",
         get_text_anchor="middle",
         font_family="Arial, Helvetica, sans-serif",
-        font_weight=700,
+        billboard=True,
         pickable=False,
     )
 
@@ -2671,6 +2684,7 @@ def point_layers(layer_prefix: str, data: List[Dict[str, Any]], radius: Any = 65
     prepared = _prepare_point_data(data)
     return [
         scatter_layer(f"{layer_prefix}-points", prepared, radius),
+        text_layer(f"{layer_prefix}-label-shadow", prepared, size + 2, shadow=True),
         text_layer(f"{layer_prefix}-labels", prepared, size),
     ]
 
@@ -2780,10 +2794,12 @@ def render_map_info(height: int) -> None:
     # The anchor is rendered immediately before the PyDeck canvas. Positioning
     # the control by the chart height keeps it inside the map's lower-right
     # corner and away from the native zoom/navigation controls.
-    top_offset = max(18, int(height) - 50)
+    top_offset = max(18, int(height) - 46)
+    mask_offset = max(18, int(height) - 48)
     st.markdown(
         f"""
         <div class="sr-map-info-anchor">
+          <div class="sr-map-native-info-mask" style="top:{mask_offset}px"></div>
           <details class="sr-map-info-control" style="top:{top_offset}px">
             <summary title="Map help — hover for object details or click to open instructions">i</summary>
             <div class="sr-map-info-panel">
@@ -3418,8 +3434,8 @@ show_traffic_layer = True
 show_water_layer = True
 show_environment_layer = True
 show_labels_layer = True
-show_3d_buildings = bool(st.session_state.get("show_3d_buildings", True))
-show_worldpop_3d = bool(st.session_state.get("show_worldpop_3d", True))
+show_3d_buildings = False
+show_worldpop_3d = False
 
 # Stable scenario inputs used by the prevention and live-incident models.
 wind_speed_kmh = 16
@@ -4301,7 +4317,7 @@ def page_incident_overview() -> None:
             "details": f"Leak estimate: {incident_state['dynamic_leak']:.0f} kg/min<br/>{active.description}",
         }], 100, 22)
 
-        pitch = 54 if (show_3d_buildings or show_worldpop_3d) else 42
+        pitch = 0
         deck = make_deck(layers, active.lat, active.lon, 13.05, pitch, -12, use_basemap)
         render_map(deck, "incident-overview-map", 650)
         legend = [
@@ -4323,10 +4339,6 @@ def page_incident_overview() -> None:
             legend.append(("▰", "Water receptor", "#00A8FF"))
         if show_environment_layer:
             legend.append(("▰", "Protected / environmental area", "#00D68F"))
-        if show_3d_buildings:
-            legend.append(("▥", "Illustrative building massing 3D", "#899FB2"))
-        if show_worldpop_3d:
-            legend.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
         render_map_legend(legend, "Operational map legend")
 
     with info_col:
@@ -4460,7 +4472,7 @@ def page_population() -> None:
             "lon": active.lon, "lat": active.lat, "color": THREAT_COLOR[active.threat] + [245], "glyph": MAP_SYMBOL_GLYPH["incident"],
             "title": active.id, "details": active.description,
         }], 92, 22)
-        pitch = 52 if (show_3d_buildings or show_worldpop_3d) else 34
+        pitch = 0
         render_map(make_deck(layers, active.lat, active.lon, 12.45, pitch, -8, use_basemap), "population-protection-map", 680)
         population_legend: List[Tuple[str, str, str]] = [
             (MAP_SYMBOL_GLYPH["incident"], "Accident source", "#FF595E"),
@@ -4471,10 +4483,6 @@ def page_population() -> None:
             (MAP_SYMBOL_GLYPH["shelter"], "Evacuation shelter", "#00D68F"),
             ("▰", "Priority buffer: red / amber / cyan", "#FFD166"),
         ]
-        if show_3d_buildings:
-            population_legend.append(("▥", "Illustrative building massing 3D", "#899FB2"))
-        if show_worldpop_3d:
-            population_legend.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
         render_map_legend(population_legend, "Population protection legend")
         st.info(f"Preview: **{preview.title}**. Buffer size reflects population and vulnerability; color reflects dynamic operational priority.")
 
@@ -4633,7 +4641,7 @@ def page_dispatch() -> None:
 
         center_lat = (selected_resource.lat + selected_target["lat"]) / 2
         center_lon = (selected_resource.lon + selected_target["lon"]) / 2
-        dispatch_pitch = 52 if show_3d_buildings else 38
+        dispatch_pitch = 0
         render_map(make_deck(layers, center_lat, center_lon, 12.35, dispatch_pitch, -8, use_basemap), "dispatch-resources-map", 690)
         render_map_legend([
             (AGENCY_GLYPH[agency], f"{AGENCY_LABEL[agency]} origin / active unit", "#%02X%02X%02X" % tuple(AGENCY_COLOR[agency])),
@@ -4646,7 +4654,6 @@ def page_dispatch() -> None:
             ("◉", "Requested halo", "#FFD166"),
             ("◉", "En-route halo", "#00C4FF"),
             ("◉", "On-scene halo", "#FFFFFF"),
-            *(([("▥", "Illustrative building massing 3D", "#899FB2")] if show_3d_buildings else [])),
         ], "Dispatch legend")
 
     st.markdown('<div class="sr-h2">Receiving hospital availability</div>', unsafe_allow_html=True)
@@ -4867,13 +4874,6 @@ def consolidated_map_layers() -> List[pdk.Layer]:
     """Build the complete operational map without hiding existing decision layers."""
     layers: List[pdk.Layer] = []
 
-    building_layer = illustrative_buildings_layer("plan")
-    population_3d = worldpop_3d_layer("plan")
-    if building_layer:
-        layers.append(building_layer)
-    if population_3d:
-        layers.append(population_3d)
-
     if show_environment_layer:
         layers.extend(public_environment_layers("plan"))
     if show_water_layer:
@@ -4969,7 +4969,7 @@ def page_plan() -> None:
     map_col, plan_col = st.columns([1.62, 1])
 
     with map_col:
-        pitch = 54 if (show_3d_buildings or show_worldpop_3d) else 40
+        pitch = 0
         deck = make_deck(consolidated_map_layers(), active.lat, active.lon, 12.3, pitch, -10, use_basemap)
         render_map(deck, "consolidated-plan-map", 690)
         legend_items: List[Tuple[str, str, str]] = [
@@ -4979,13 +4979,14 @@ def page_plan() -> None:
         if show_population_layer:
             legend_items += [
                 (MAP_SYMBOL_GLYPH["community"], "Vulnerable destination and dynamic buffer", "#FFD166"),
-                (MAP_SYMBOL_GLYPH["hospital"], "Receiving hospital and availability", "#00A8FF"),
+                (MAP_SYMBOL_GLYPH["hospital"], "Hospital badge (+) · receiving capacity", "#00A8FF"),
             ]
         if show_resources_layer:
             legend_items += [
-                (MAP_SYMBOL_GLYPH["fire"], "Fire / HazMat origin or active unit", "#FF7E22"),
-                (MAP_SYMBOL_GLYPH["police"], "Police origin or active unit", "#00C4FF"),
-                (MAP_SYMBOL_GLYPH["ambulance"], "EMS origin or active unit", "#4C6FFF"),
+                (MAP_SYMBOL_GLYPH["fire"], "Fire badge (F) · base or active unit", "#FF7E22"),
+                (MAP_SYMBOL_GLYPH["hazmat"], "HazMat badge (H) · base or active unit", "#FF2D95"),
+                (MAP_SYMBOL_GLYPH["police"], "Police badge (P) · base or active unit", "#00C4FF"),
+                (MAP_SYMBOL_GLYPH["ambulance"], "EMS badge (A) · base or active unit", "#4C6FFF"),
                 ("◉", "Requested / en route / on scene halo", "#FFD166"),
             ]
         if show_routes_layer:
@@ -4995,10 +4996,6 @@ def page_plan() -> None:
                 ("▰", "Environmental protection receptor", "#00D68F"),
                 ("▰", "Water / wetland receptor", "#00A8FF"),
             ]
-        if show_3d_buildings:
-            legend_items.append(("▥", "Illustrative building massing 3D", "#899FB2"))
-        if show_worldpop_3d:
-            legend_items.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
         render_map_legend(legend_items, "Consolidated plan legend")
 
         timeline = go.Figure()
@@ -5471,7 +5468,7 @@ def page_historical_study() -> None:
             "title": "Accident source", "details": "Jinghu Expressway Huai'an section · liquid chlorine release",
         }], 105, 23)
 
-        pitch = 54 if (show_3d_buildings or show_worldpop_3d) else 40
+        pitch = 0
         deck = make_deck(layers, active.lat, active.lon, 12.4, pitch, -10, use_basemap)
         render_map(deck, "live-case-map", 680)
         live_legend: List[Tuple[str, str, str]] = [
@@ -5486,10 +5483,6 @@ def page_historical_study() -> None:
             ("━", "HazMat / specialist mission", "#FF2D95"),
             ("━", "Environmental monitoring mission", "#00D68F"),
         ]
-        if show_3d_buildings:
-            live_legend.append(("▥", "Illustrative building massing 3D", "#899FB2"))
-        if show_worldpop_3d:
-            live_legend.append(("▥", "Population / vulnerability volume 3D", "#FFD166"))
         render_map_legend(live_legend, "Live response legend")
 
     with insight_col:
@@ -5689,15 +5682,6 @@ def page_incident_command() -> None:
             f'<div class="sr-small">{active.road} · detected {active.detected_at} · live command workspace</div></div>',
             unsafe_allow_html=True,
         )
-
-    st.markdown('<div class="sr-map-view-bar"><div class="sr-small">MAP VIEW · 3D context can be switched off when a flatter tactical view is preferred.</div></div>', unsafe_allow_html=True)
-    view_a, view_b, view_c = st.columns([1.05, 1.05, 3.8])
-    with view_a:
-        st.toggle("3D buildings", key="show_3d_buildings")
-    with view_b:
-        st.toggle("Population 3D", key="show_worldpop_3d")
-    with view_c:
-        st.caption("Buildings are contextual massing; population columns express estimated presence and vulnerability, not surveyed height.")
 
     if active.id == HISTORICAL_INCIDENT_ID:
         current_stage = HISTORICAL_RECONSTRUCTION_STAGES[int(st.session_state.get("historical_stage", 0))]
