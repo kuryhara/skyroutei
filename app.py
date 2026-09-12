@@ -5104,17 +5104,19 @@ def render_decision_options(options: List[DecisionOption], preview_key: str) -> 
             f'<div class="sr-panel{css}"><div class="sr-title">{option.title}</div><div class="sr-body">{option.summary}</div><span class="sr-badge badge-ai">confidence {option.confidence:.0%}</span><span class="sr-badge">implementation {option.implementation_min} min</span><span class="sr-badge badge-safe">residual {option.residual_risk}</span>{selected_badge}{preview_badge}</div>',
             unsafe_allow_html=True,
         )
+        # Plain .sr-card tiles (not st.metric) for all three: st.metric reserves a
+        # fixed layout meant for a short number, so the longer Resources string
+        # either got clipped with "…" or left a block of dead space beneath it,
+        # and the three columns never lined up. A shared card class with one
+        # min-height keeps them aligned and lets Resources wrap in full instead
+        # of truncating.
         m1, m2, m3 = st.columns(3)
-        m1.metric("People protected", f"{option.people_protected:,}" if option.people_protected else "—")
-        m2.metric("Traffic impact", option.traffic_impact)
-        with m3:
-            # The keyed wrapper keeps this longer value compact without
-            # shrinking every metric in the operational interface.
-            with st.container(key=f"resource_metric_{option.id}"):
-                st.metric("Resources", option.resource_need[:28] + ("…" if len(option.resource_need) > 28 else ""))
+        people_val = f"{option.people_protected:,}" if option.people_protected else "—"
+        m1.markdown(f'<div class="sr-card"><div class="k">People protected</div><div class="v">{people_val}</div></div>', unsafe_allow_html=True)
+        m2.markdown(f'<div class="sr-card"><div class="k">Traffic impact</div><div class="v">{option.traffic_impact}</div></div>', unsafe_allow_html=True)
+        m3.markdown(f'<div class="sr-card"><div class="k">Resources</div><div class="v" style="font-size:13px;line-height:1.4;">{option.resource_need}</div></div>', unsafe_allow_html=True)
         with st.expander("Why, requirements and map consequence"):
             st.write(f"**Agent reason:** {option.agent_reason}")
-            st.write(f"**Resources:** {option.resource_need}")
             st.write(f"**Map consequence:** {option.map_effect}")
         b1, b2 = st.columns(2)
         if b1.button("Showing on map" if previewing else "Visualise on map", key=f"preview-{option.id}", disabled=previewing, use_container_width=True):
