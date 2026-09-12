@@ -5201,12 +5201,33 @@ def page_dispatch() -> None:
             unsafe_allow_html=True,
         )
     st.markdown('<div class="sr-h2">Select a real origin base, assign a mission destination and prepare dispatch</div>', unsafe_allow_html=True)
+    render_ai_command_strip()
     render_resource_availability()
     render_dispatch_receipt()
+
+    st.markdown('<div class="sr-h2">Configure a mission</div>', unsafe_allow_html=True)
+    agency_keys = list(AGENCY_LABEL.keys())
+    if "dispatch_agency" not in st.session_state or st.session_state.dispatch_agency not in agency_keys:
+        st.session_state.dispatch_agency = agency_keys[0]
+    chip_cols = st.columns(len(agency_keys))
+    for chip_col, key in zip(chip_cols, agency_keys):
+        active_chip = key == st.session_state.dispatch_agency
+        with chip_col:
+            st.markdown(f'<div class="sr-agency-chip-wrap{" active" if active_chip else ""}">', unsafe_allow_html=True)
+            if st.button(
+                f"{AGENCY_GLYPH[key]}  {AGENCY_LABEL[key]}",
+                key=f"agency_chip_{key}",
+                use_container_width=True,
+                type="primary" if active_chip else "secondary",
+            ):
+                st.session_state.dispatch_agency = key
+                st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+    agency = st.session_state.dispatch_agency
+
     controls, map_col = st.columns([1, 1.55])
 
     with controls:
-        agency = st.selectbox("Agency to configure", list(AGENCY_LABEL.keys()), format_func=lambda key: AGENCY_LABEL[key])
         targets = mission_targets_for_kind(agency)
         target_ids = [item["id"] for item in targets]
         current_target_id = st.session_state.selected_mission_target_ids.get(agency, target_ids[0] if target_ids else "TARGET-INCIDENT")
