@@ -231,17 +231,20 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 [class*="st-key-map_chrome_"] [data-testid="stHorizontalBlock"]{{align-items:center!important;gap:0!important;}}
 [class*="st-key-map_chrome_"] [data-testid="column"]{{padding:0!important;}}
 [class*="st-key-map_chrome_"] [data-testid="stPopover"]{{display:flex!important;justify-content:flex-end!important;align-items:center!important;}}
-[class*="st-key-map_chrome_"] [data-testid="stPopover"]>button{{height:26px!important;width:26px!important;min-height:26px!important;min-width:26px!important;padding:0!important;margin:0!important;border-radius:50%!important;background:rgba(5,15,28,.98)!important;border:1px solid rgba(255,255,255,.42)!important;color:#fff!important;font:700 11px 'Poppins'!important;line-height:1!important;box-shadow:none!important;}}
-[class*="st-key-map_chrome_"] [data-testid="stPopover"]>button svg{{display:none!important;}}
+[class*="st-key-map_chrome_"] [data-testid="stPopover"]>button,[class*="st-key-map_chrome_"] [data-testid="stPopoverButton"],[class*="st-key-map_chrome_"] button[data-testid="stPopoverButton"]{{height:26px!important;width:26px!important;min-height:26px!important;min-width:26px!important;padding:0!important;margin:0!important;border-radius:50%!important;background:rgba(5,15,28,.98)!important;border:1px solid rgba(255,255,255,.42)!important;color:#fff!important;font:700 11px 'Poppins'!important;line-height:1!important;box-shadow:none!important;}}
+[class*="st-key-map_chrome_"] [data-testid="stPopover"]>button svg,[class*="st-key-map_chrome_"] [data-testid="stPopoverButton"] svg{{display:none!important;}}
 .sr-map-legend{{border:1px solid #405334;border-radius:12px;padding:10px 12px;background:rgba(6,17,14,.94);margin:7px 0 12px;}}
 .sr-map-legend-title{{font-family:'Poppins';font-size:11px;font-weight:700;color:#D5F26D;margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em;}}
 .sr-map-legend-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:7px 12px;}}
 .sr-map-legend-item{{display:flex;align-items:center;gap:8px;font-size:10px;color:#D6E2C6;line-height:1.3;}}
 .sr-legend-symbol{{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font-size:13px;font-weight:700;border:1px solid rgba(242,246,232,.45);flex:0 0 18px;}}
 .sr-legend-incident-icon,.sr-legend-map-icon{{width:18px;height:18px;display:block;object-fit:contain;filter:drop-shadow(0 0 5px rgba(213,242,109,.22));flex:0 0 18px;}}
-.sr-workflow{{position:sticky;top:.7rem;border:1px solid #405334;border-radius:14px;padding:14px 11px;background:linear-gradient(180deg,rgba(8,19,15,.98),rgba(4,11,8,.98));box-shadow:0 0 28px rgba(213,242,109,.06);}}
+div[data-testid="stHorizontalBlock"]:has(.sr-workflow){{align-items:stretch!important;}}
+div[data-testid="stHorizontalBlock"]:has(.sr-workflow)>div[data-testid="column"]{{display:flex!important;flex-direction:column!important;}}
+div[data-testid="stHorizontalBlock"]:has(.sr-workflow)>div[data-testid="column"]>div{{display:flex!important;flex-direction:column!important;flex:1!important;}}
+.sr-workflow{{position:relative;top:auto;flex:1;display:flex;flex-direction:column;border:1px solid #405334;border-radius:14px;padding:14px 11px;background:linear-gradient(180deg,rgba(8,19,15,.98),rgba(4,11,8,.98));box-shadow:0 0 28px rgba(213,242,109,.06);}}
 .sr-workflow-title{{font:9px 'JetBrains Mono';color:#B7C99D;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px;}}
-.sr-workflow-item{{display:grid;grid-template-columns:32px 1fr;gap:9px;position:relative;min-height:58px;opacity:.42;}}
+.sr-workflow-item{{display:grid;grid-template-columns:32px 1fr;gap:9px;position:relative;flex:1;min-height:58px;opacity:.42;}}
 .sr-workflow-item:after{{content:'';position:absolute;left:15px;top:32px;bottom:-8px;width:1px;background:#405334;}}
 .sr-workflow-item:last-child:after{{display:none;}}
 .sr-workflow-item.done,.sr-workflow-item.active{{opacity:1;}}
@@ -264,6 +267,12 @@ div[role="radiogroup"] label:has(input:checked){{border-color:#D5F26D;background
 .sr-agent-return{{border:1px solid rgba(213,242,109,.28);border-radius:11px;padding:8px 10px;background:rgba(213,242,109,.045);margin-bottom:10px;}}
 .sr-map-legend-route{{display:inline-block;width:18px;height:4px;border-radius:999px;box-shadow:0 0 7px currentColor;}}
 .sr-map-legend-area{{display:inline-block;width:18px;height:13px;border-radius:3px;border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 0 0 2px rgba(0,0,0,.18);}}
+div[data-testid="stRadioGroup"]{{display:flex!important;gap:8px!important;}}
+div[data-testid="stRadioGroup"][aria-orientation="vertical"]{{flex-direction:column!important;align-items:stretch!important;}}
+div[data-testid="stRadioGroup"][aria-orientation="horizontal"]{{flex-direction:row!important;flex-wrap:wrap!important;align-items:stretch!important;}}
+div[data-testid="stRadioGroup"][aria-orientation="vertical"] label[data-testid="stRadioOption"]{{width:100%!important;box-sizing:border-box!important;}}
+div[data-testid="stRadioGroup"][aria-orientation="horizontal"] label[data-testid="stRadioOption"]{{flex:1 1 0!important;min-width:0!important;box-sizing:border-box!important;}}
+div[data-testid="stRadioGroup"] label[data-testid="stRadioOption"] p{{overflow-wrap:anywhere;}}
 @media(max-width:1000px){{.sr-workflow{{position:relative;top:auto}}.sr-brand-lockup{{gap:10px}}.sr-brand-icon{{height:44px}}.sr-brand-wordmark{{font-size:30px;letter-spacing:.10em}}.sr-sidebar-brand .sr-brand-wordmark{{font-size:24px;}}}}
 
 
@@ -5777,12 +5786,12 @@ def page_plan() -> None:
             template="plotly_dark",
             paper_bgcolor=PANEL,
             plot_bgcolor=PANEL,
-            height=300,
-            margin=dict(t=35, b=25, l=45, r=45),
+            height=320,
+            margin=dict(t=70, b=25, l=45, r=45),
             xaxis_title="Minutes after command",
             yaxis=dict(title="People"),
             yaxis2=dict(title="Completion %", overlaying="y", side="right", range=[0, 100]),
-            legend=dict(orientation="h", y=1.12),
+            legend=dict(orientation="h", yanchor="bottom", y=1.04, xanchor="left", x=0),
         )
         st.plotly_chart(timeline, use_container_width=True)
 
